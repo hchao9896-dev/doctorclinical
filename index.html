@@ -1,0 +1,2351 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Clinical Desk - Bác sĩ Workspace</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0fdfa',
+              100: '#ccfbf1',
+              500: '#14b8a6',
+              600: '#0d9488',
+              700: '#0f766e',
+              800: '#115e59',
+              900: '#134e4a',
+            },
+            clinical: {
+              bg: '#f8fafc',
+              darkbg: '#0b1120',
+              card: '#ffffff',
+              darkcard: '#1e293b',
+              navy: '#0f172a'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .font-mono-calc {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(0,0,0,0.03);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(100,116,139,0.3);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(100,116,139,0.5);
+    }
+  </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col transition-colors duration-200">
+
+  <!-- TOP APP BAR -->
+  <header class="sticky top-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 py-2.5 flex items-center justify-between shadow-xs">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-teal-600 to-cyan-500 flex items-center justify-center text-white shadow-md shadow-teal-500/20">
+        <i data-lucide="activity" class="w-6 h-6"></i>
+      </div>
+      <div>
+        <div class="flex items-center gap-2">
+          <h1 class="text-lg font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-1.5">
+            CLINICAL DESK
+            <span class="text-[10px] uppercase font-semibold px-1.5 py-0.5 rounded-full bg-teal-100 dark:bg-teal-900/50 text-teal-800 dark:text-teal-300">MD Pro</span>
+          </h1>
+        </div>
+        <p class="text-xs text-slate-500 dark:text-slate-400">Sổ tay lâm sàng & Trợ lý bác sĩ trực</p>
+      </div>
+    </div>
+
+    <!-- Right Controls -->
+    <div class="flex items-center gap-2">
+      <!-- Sync Status Badge -->
+      <div class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-xs text-emerald-700 dark:text-emerald-300">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span id="storage-status-text">Đồng bộ sẵn sàng</span>
+      </div>
+
+      <!-- Dark Mode Toggle -->
+      <button id="theme-toggle" class="p-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition" title="Đổi chế độ sáng/tối trực đêm">
+        <i data-lucide="moon" class="w-5 h-5 hidden dark:block"></i>
+        <i data-lucide="sun" class="w-5 h-5 block dark:hidden"></i>
+      </button>
+
+      <!-- Quick Action: Upload button on desktop header -->
+      <button onclick="document.getElementById('ecg-gallery-input').click()" class="hidden md:flex items-center gap-1.5 px-3 py-1.5 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-xs font-semibold cursor-pointer shadow-sm transition active:scale-95">
+        <i data-lucide="image" class="w-4 h-4"></i>
+        <span>Tải ảnh ECG</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <div class="flex-1 flex max-w-7xl w-full mx-auto pb-16 md:pb-6">
+    
+    <!-- DESKTOP SIDEBAR NAVIGATION -->
+    <aside class="hidden md:block w-64 border-r border-slate-200 dark:border-slate-800 p-4 shrink-0 bg-white dark:bg-slate-900/50">
+      <div class="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-3 px-3">
+        Phân hệ làm việc
+      </div>
+      <nav class="space-y-1" id="desktop-nav">
+        <!-- Buttons injected dynamically -->
+      </nav>
+
+      <!-- Auto-purge notice box -->
+      <div class="mt-8 p-3 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60 text-xs text-amber-800 dark:text-amber-300">
+        <div class="flex items-center gap-1.5 font-semibold mb-1">
+          <i data-lucide="clock" class="w-4 h-4 text-amber-600 dark:text-amber-400"></i>
+          <span>Bộ nhớ đệm 30 ngày</span>
+        </div>
+        <p class="text-[11px] text-amber-700/80 dark:text-amber-300/80 leading-relaxed">
+          Hình ảnh ECG không ghim sẽ tự động được xóa sau 30 ngày để tối ưu bộ nhớ thiết bị.
+        </p>
+      </div>
+
+      <!-- Quick Doctor Signature or Hospital Dept -->
+      <div class="mt-4 p-3 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs">
+        <div class="text-slate-500 dark:text-slate-400 font-medium">Bác sĩ phụ trách:</div>
+        <input type="text" id="doctor-name-input" placeholder="BS. Nguyễn Văn A" class="mt-1 w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded px-2 py-1 text-xs font-medium focus:ring-1 focus:ring-teal-500 outline-none">
+        <input type="text" id="doctor-dept-input" placeholder="Khoa Cấp cứu / Hồi sức" class="mt-1.5 w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded px-2 py-1 text-xs text-slate-600 dark:text-slate-400 focus:ring-1 focus:ring-teal-500 outline-none">
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT VIEW AREA -->
+    <main class="flex-1 p-3 sm:p-6 overflow-y-auto min-w-0">
+
+      <!-- ========================================== -->
+      <!-- TAB 1: HÌNH ẢNH ECG & ĐỒNG BỘ 30 NGÀY -->
+      <!-- ========================================== -->
+      <section id="tab-ecg-gallery" class="tab-content active space-y-4">
+        <!-- Action Header -->
+        <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-xs">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <h2 class="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <i data-lucide="image" class="w-6 h-6 text-teal-600"></i>
+                Kho Hình ảnh ECG & Ca bệnh
+              </h2>
+              <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+                Chụp ảnh từ điện thoại, đồng bộ mở trên máy tính. Tự động tính hạn 30 ngày dọn rác.
+              </p>
+            </div>
+
+            <!-- Upload Controls -->
+            <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+              <!-- Input 1: Thư viện ảnh (Không có capture -> mở Photo Gallery trên iOS/Android) -->
+              <input type="file" id="ecg-gallery-input" accept="image/*" multiple class="hidden">
+              
+              <!-- Input 2: Chụp ảnh trực tiếp bằng Camera (Có capture) -->
+              <input type="file" id="ecg-camera-input" accept="image/*" capture="environment" class="hidden">
+
+              <!-- Nút mở Thư viện ảnh -->
+              <button onclick="document.getElementById('ecg-gallery-input').click()" class="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3.5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs sm:text-sm font-semibold shadow-md shadow-teal-600/20 transition active:scale-95" title="Chọn ảnh có sẵn từ Album ảnh">
+                <i data-lucide="image" class="w-4 h-4"></i>
+                <span>Thư viện ảnh</span>
+              </button>
+
+              <!-- Nút mở Camera chụp ngay -->
+              <button onclick="document.getElementById('ecg-camera-input').click()" class="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3.5 py-2.5 bg-slate-800 hover:bg-slate-700 text-white dark:bg-slate-700 dark:hover:bg-slate-600 rounded-xl text-xs sm:text-sm font-semibold shadow-sm transition active:scale-95" title="Mở máy ảnh chụp trực tiếp">
+                <i data-lucide="camera" class="w-4 h-4"></i>
+                <span>Chụp ảnh</span>
+              </button>
+
+              <!-- Nút Nạp Mẫu -->
+              <button onclick="loadDemoECGs()" class="px-3 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl text-xs font-medium transition" title="Tải ảnh mẫu để thử nghiệm">
+                Nạp Mẫu
+              </button>
+            </div>
+          </div>
+
+          <!-- Filter & Search Bar -->
+          <div class="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3 text-xs">
+            <div class="relative flex-1 min-w-[200px]">
+              <i data-lucide="search" class="w-4 h-4 absolute left-3 top-2.5 text-slate-400"></i>
+              <input type="text" id="ecg-search-input" placeholder="Tìm theo tên BN, mã giường, chẩn đoán..." class="w-full pl-9 pr-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-teal-500">
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-slate-500">Lọc:</span>
+              <button onclick="filterECG('all')" class="ecg-filter-btn px-2.5 py-1.5 rounded-lg bg-teal-100 text-teal-800 dark:bg-teal-900/60 dark:text-teal-200 font-medium" data-filter="all">Tất cả (<span id="count-all">0</span>)</button>
+              <button onclick="filterECG('expiring')" class="ecg-filter-btn px-2.5 py-1.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800" data-filter="expiring">Sắp hết hạn (<span id="count-expiring">0</span>)</button>
+              <button onclick="filterECG('pinned')" class="ecg-filter-btn px-2.5 py-1.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800" data-filter="pinned">Đã ghim (<span id="count-pinned">0</span>)</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ECG Grid Gallery -->
+        <div id="ecg-gallery-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Dynamically populated -->
+        </div>
+
+        <!-- Empty state placeholder -->
+        <div id="ecg-empty-state" class="hidden py-16 text-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl bg-white/50 dark:bg-slate-900/50">
+          <i data-lucide="inbox" class="w-12 h-12 mx-auto text-slate-400 mb-2"></i>
+          <p class="text-sm font-semibold text-slate-600 dark:text-slate-300">Chưa có ảnh ECG hoặc ca bệnh nào</p>
+          <p class="text-xs text-slate-400 mt-1 max-w-sm mx-auto">Chụp ảnh từ điện thoại hoặc bấm "Nạp ECG Mẫu" phía trên để trải nghiệm ngay.</p>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- TAB 2: AI ĐỌC & PHÂN TÍCH HÌNH ẢNH ECG -->
+      <!-- ========================================== -->
+      <section id="tab-ai-ecg" class="tab-content hidden space-y-4">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-xs">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="p-1.5 bg-gradient-to-tr from-purple-600 to-indigo-500 rounded-lg text-white">
+                  <i data-lucide="sparkles" class="w-5 h-5"></i>
+                </span>
+                <h2 class="text-xl font-bold text-slate-900 dark:text-white">Trợ lý AI Đọc Điện Tim (ECG Assistant)</h2>
+              </div>
+              <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+                Phân tích nhịp, trục, các khoảng $PR, QRS, QT/QTc$, biến đổi ST-T và cảnh báo nhồi máu cơ tim / rối loạn nhịp.
+              </p>
+            </div>
+
+            <!-- Pre-loaded sample picker -->
+            <div class="flex items-center gap-2">
+              <label class="text-xs font-semibold text-slate-500">Ca mẫu:</label>
+              <select id="ai-sample-select" onchange="loadAiSampleCase(this.value)" class="text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-1.5 focus:ring-teal-500">
+                <option value="">-- Chọn ca lâm sàng mẫu --</option>
+                <option value="stemi">1. NMCT Cấp ST Chênh Lên (STEMI Thành Trước)</option>
+                <option value="afib">2. Rung Nhĩ Đáp Ứng Thất Nhanh (AFib)</option>
+                <option value="lbbb">3. Block Nhánh Trái Hoàn Toàn (LBBB)</option>
+                <option value="normal">4. Điện tâm đồ Nhịp Xoang Bình Thường</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Academic Disclaimer Alert -->
+          <div class="mt-4 p-3 rounded-xl bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-800/50 flex items-start gap-2.5 text-xs text-indigo-900 dark:text-indigo-200">
+            <i data-lucide="shield-alert" class="w-4 h-4 shrink-0 text-indigo-600 dark:text-indigo-400 mt-0.5"></i>
+            <div>
+              <span class="font-bold">Khuyến cáo học thuật & Lâm sàng:</span>
+              Kết quả AI mang tính chất tham khảo trợ giúp ra quyết định nhanh cho Bác sĩ, không thay thế chẩn đoán lâm sàng và quyết định điều trị của Bác sĩ điều trị.
+            </div>
+          </div>
+        </div>
+
+        <!-- AI Reader Workspace: Left Image - Right Analysis -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+          <!-- Left: ECG Viewer with grid inspection -->
+          <div class="lg:col-span-5 space-y-3">
+            <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-800 shadow-xs">
+              <h3 class="text-sm font-bold text-slate-800 dark:text-slate-200 mb-2 flex items-center justify-between">
+                <span>Ảnh điện tim cần phân tích</span>
+                <span id="current-analyzing-name" class="text-xs font-normal text-slate-500">Chưa chọn ảnh</span>
+              </h3>
+              
+              <div id="ai-image-preview-container" class="relative rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden bg-slate-100 dark:bg-slate-950 min-h-[260px] flex items-center justify-center">
+                <img id="ai-preview-img" src="" class="hidden max-h-[350px] w-auto object-contain cursor-zoom-in" onclick="openLightbox(this.src, 'Ảnh ECG phân tích')">
+                <div id="ai-preview-placeholder" class="text-center p-6 text-slate-400">
+                  <i data-lucide="upload-cloud" class="w-10 h-10 mx-auto mb-2 text-slate-300 dark:text-slate-600"></i>
+                  <p class="text-xs font-medium">Chọn một ca mẫu phía trên hoặc tải ảnh ECG từ điện thoại/máy tính</p>
+                  <div class="mt-3 flex flex-wrap items-center justify-center gap-2">
+                    <input type="file" id="ai-file-upload" accept="image/*" class="hidden" onchange="handleAiFileUpload(event)">
+                    <input type="file" id="ai-camera-upload" accept="image/*" capture="environment" class="hidden" onchange="handleAiFileUpload(event)">
+                    <button onclick="document.getElementById('ai-file-upload').click()" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-200 dark:bg-slate-800 hover:bg-teal-600 hover:text-white rounded-lg text-xs font-semibold transition">
+                      <i data-lucide="image" class="w-3.5 h-3.5"></i>
+                      <span>Thư viện ảnh</span>
+                    </button>
+                    <button onclick="document.getElementById('ai-camera-upload').click()" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-200 dark:bg-slate-800 hover:bg-slate-700 hover:text-white rounded-lg text-xs font-semibold transition">
+                      <i data-lucide="camera" class="w-3.5 h-3.5"></i>
+                      <span>Chụp ảnh</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Quick action buttons -->
+              <div class="mt-3 flex gap-2">
+                <button id="btn-run-ai-analysis" onclick="runAiEcgAnalysis()" class="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-semibold rounded-xl text-sm shadow-md shadow-indigo-600/20 active:scale-95 transition disabled:opacity-50">
+                  <i data-lucide="sparkles" class="w-4 h-4"></i>
+                  <span>Bắt đầu Phân tích AI</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Advanced Live Gemini API config accordion -->
+            <div class="bg-white dark:bg-slate-900 rounded-xl p-3 border border-slate-200 dark:border-slate-800 text-xs">
+              <div class="flex items-center justify-between cursor-pointer" onclick="toggleApiConfig()">
+                <div class="flex items-center gap-2 font-semibold text-slate-700 dark:text-slate-300">
+                  <i data-lucide="key" class="w-4 h-4 text-purple-600"></i>
+                  <span>Cấu hình Gemini Vision API trực tiếp (Tùy chọn)</span>
+                </div>
+                <i data-lucide="chevron-down" id="api-chevron" class="w-4 h-4 text-slate-400 transition-transform"></i>
+              </div>
+              <div id="api-config-body" class="hidden mt-3 pt-3 border-t border-slate-100 dark:border-slate-800 space-y-2">
+                <p class="text-[11px] text-slate-500">Mặc định hệ thống dùng mô hình AI Phân tích chuyên sâu tích hợp sẵn. Nếu Bác sĩ có Gemini API Key riêng, có thể dán vào đây để phân tích trực tuyến trực tiếp với Google DeepMind Gemini Vision:</p>
+                <div class="flex gap-2">
+                  <input type="password" id="gemini-api-key" placeholder="AIzaSy..." class="flex-1 px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs font-mono">
+                  <button onclick="saveApiKey()" class="px-3 py-1.5 bg-teal-600 text-white rounded-lg font-semibold hover:bg-teal-700">Lưu</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: AI Findings & Structured Clinical Interpretation Report -->
+          <div class="lg:col-span-7">
+            <div id="ai-results-panel" class="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
+              <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+                <div class="flex items-center gap-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-slate-300" id="ai-status-indicator"></span>
+                  <h3 class="text-base font-bold text-slate-900 dark:text-white">Báo cáo Phân tích Điện tâm đồ</h3>
+                </div>
+                <div class="flex items-center gap-2">
+                  <button onclick="copyAiReport()" class="px-2.5 py-1 text-xs rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-1 text-slate-600 dark:text-slate-300">
+                    <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                    <span>Copy kết quả</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- AI Output Display -->
+              <div id="ai-output-content" class="space-y-4">
+                <div class="py-12 text-center text-slate-400">
+                  <i data-lucide="cpu" class="w-10 h-10 mx-auto mb-2 opacity-50"></i>
+                  <p class="text-xs">Chưa có dữ liệu phân tích. Hãy chọn ca mẫu hoặc tải ảnh và bấm "Bắt đầu Phân tích AI".</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- TAB 3: PROTOCOL PHẪU THUẬT & QUY TRÌNH -->
+      <!-- ========================================== -->
+      <section id="tab-protocols" class="tab-content hidden space-y-4">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-xs">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div>
+              <h2 class="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <i data-lucide="scissors" class="w-6 h-6 text-teal-600"></i>
+                Protocol Phẫu thuật & Thủ thuật
+              </h2>
+              <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+                Lưu trữ các phác đồ chuẩn, checklist an toàn phòng mổ, các bước phẫu thuật và xử trí tai biến.
+              </p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="openNewProtocolModal()" class="flex items-center gap-1.5 px-3.5 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-semibold shadow-sm transition">
+                <i data-lucide="plus" class="w-4 h-4"></i>
+                <span>Thêm Protocol mới</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Category filter -->
+          <div class="mt-4 flex flex-wrap gap-2 text-xs" id="protocol-category-pills">
+            <button onclick="filterProtocols('all')" class="proto-pill active px-3 py-1.5 rounded-lg bg-teal-600 text-white font-medium" data-cat="all">Tất cả</button>
+            <button onclick="filterProtocols('Ngoại tiêu hóa')" class="proto-pill px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200" data-cat="Ngoại tiêu hóa">Ngoại tiêu hóa</button>
+            <button onclick="filterProtocols('Cấp cứu - Hồi sức')" class="proto-pill px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200" data-cat="Cấp cứu - Hồi sức">Cấp cứu - Hồi sức</button>
+            <button onclick="filterProtocols('Chấn thương')" class="proto-pill px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200" data-cat="Chấn thương">Chấn thương</button>
+            <button onclick="filterProtocols('An toàn phẫu thuật')" class="proto-pill px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200" data-cat="An toàn phẫu thuật">An toàn phẫu thuật</button>
+          </div>
+        </div>
+
+        <!-- Protocol Cards List -->
+        <div id="protocol-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Dynamically generated -->
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- TAB 4: SỬ DỤNG THUỐC & BỘ TÍNH eGFR / CrCl -->
+      <!-- ========================================== -->
+      <section id="tab-drugs" class="tab-content hidden space-y-4">
+        <!-- Main Top Bar: Drugs & Calculator Tabs -->
+        <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-xs">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div>
+              <h2 class="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <i data-lucide="pill" class="w-6 h-6 text-teal-600"></i>
+                Sử dụng Thuốc & Chỉnh liều Suy thận (eGFR / CrCl)
+              </h2>
+              <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+                Công cụ tính độ thanh thải Creatinine tự động, ước tính mức lọc cầu thận và hướng dẫn chỉnh liều kháng sinh, thuốc kháng đông.
+              </p>
+            </div>
+            
+            <!-- Quick Subtab Switcher -->
+            <div class="flex rounded-xl p-1 bg-slate-100 dark:bg-slate-800 text-xs font-semibold">
+              <button onclick="switchDrugSubTab('egfr')" id="subtab-btn-egfr" class="px-3 py-1.5 rounded-lg bg-white dark:bg-slate-700 text-teal-700 dark:text-teal-300 shadow-xs">
+                🧮 Máy tính eGFR & CrCl
+              </button>
+              <button onclick="switchDrugSubTab('list')" id="subtab-btn-list" class="px-3 py-1.5 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900">
+                📖 Tra cứu Dược thư
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- SUBTAB 1: eGFR & CrCl CALCULATOR (CORE MEDICAL FEATURE) -->
+        <div id="drug-egfr-calculator-view" class="space-y-4">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+            
+            <!-- Left: Clinical Input Form -->
+            <div class="lg:col-span-5 bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
+              <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2.5">
+                <h3 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                  <i data-lucide="calculator" class="w-4 h-4 text-teal-600"></i>
+                  Thông số Người bệnh
+                </h3>
+                <button onclick="resetEgfrInputs()" class="text-xs text-slate-400 hover:text-teal-600 flex items-center gap-1">
+                  <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                  <span>Làm mới</span>
+                </button>
+              </div>
+
+              <!-- Input Grid -->
+              <div class="space-y-3.5 text-xs">
+                <!-- Giới tính -->
+                <div>
+                  <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Giới tính sinh học</label>
+                  <div class="grid grid-cols-2 gap-2">
+                    <button type="button" id="egfr-gender-male" onclick="setEgfrGender('male')" class="py-2 px-3 rounded-xl border border-teal-600 bg-teal-50 dark:bg-teal-950/40 text-teal-700 dark:text-teal-300 font-bold flex items-center justify-center gap-1.5 transition">
+                      <span>Nam (Male)</span>
+                    </button>
+                    <button type="button" id="egfr-gender-female" onclick="setEgfrGender('female')" class="py-2 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-medium flex items-center justify-center gap-1.5 transition">
+                      <span>Nữ (Female)</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Tuổi -->
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Tuổi (Năm)</label>
+                    <div class="relative">
+                      <input type="number" id="egfr-age" value="65" min="18" max="110" oninput="calculateEgfr()" class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-teal-500 outline-none">
+                      <span class="absolute right-3 top-2.5 text-slate-400 text-xs">tuổi</span>
+                    </div>
+                  </div>
+
+                  <!-- Cân nặng -->
+                  <div>
+                    <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Cân nặng (kg)</label>
+                    <div class="relative">
+                      <input type="number" id="egfr-weight" value="60" min="20" max="250" step="0.5" oninput="calculateEgfr()" class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-teal-500 outline-none">
+                      <span class="absolute right-3 top-2.5 text-slate-400 text-xs">kg</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Serum Creatinine -->
+                <div>
+                  <div class="flex items-center justify-between mb-1">
+                    <label class="font-semibold text-slate-700 dark:text-slate-300">Creatinine Huyết thanh</label>
+                    <!-- Unit switcher -->
+                    <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-0.5 rounded-lg">
+                      <button type="button" id="unit-umol" onclick="setCreatinineUnit('umol')" class="px-2 py-0.5 rounded text-[11px] font-bold bg-white dark:bg-slate-700 text-teal-700 dark:text-teal-300 shadow-xs">µmol/L</button>
+                      <button type="button" id="unit-mgdl" onclick="setCreatinineUnit('mgdl')" class="px-2 py-0.5 rounded text-[11px] font-medium text-slate-500">mg/dL</button>
+                    </div>
+                  </div>
+                  <div class="relative">
+                    <input type="number" id="egfr-creatinine" value="130" min="1" max="2000" step="1" oninput="calculateEgfr()" class="w-full px-3 py-2.5 rounded-xl border border-teal-500/50 bg-teal-50/20 dark:bg-teal-950/20 text-lg font-bold text-teal-700 dark:text-teal-300 focus:ring-2 focus:ring-teal-500 outline-none font-mono-calc">
+                    <span id="current-unit-display" class="absolute right-3 top-3 text-slate-400 text-xs font-semibold">µmol/L</span>
+                  </div>
+                  <div class="mt-1 text-[11px] text-slate-400 flex items-center justify-between">
+                    <span>Quy đổi: <span id="creatinine-converted-text">130 µmol/L = 1.47 mg/dL</span></span>
+                  </div>
+                </div>
+
+                <!-- Optional: Height (for Ideal body weight if obese) -->
+                <div>
+                  <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Chiều cao (cm) <span class="font-normal text-slate-400">- Tùy chọn</span></label>
+                  <div class="relative">
+                    <input type="number" id="egfr-height" value="165" min="100" max="220" oninput="calculateEgfr()" class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs font-medium text-slate-900 dark:text-white focus:ring-1 focus:ring-teal-500 outline-none">
+                    <span class="absolute right-3 top-2 text-slate-400 text-xs">cm (BMI: <span id="bmi-display">22.0</span>)</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Quick Clinical Preset Buttons -->
+              <div class="pt-3 border-t border-slate-100 dark:border-slate-800">
+                <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block mb-2">Ca lâm sàng nhanh:</span>
+                <div class="grid grid-cols-3 gap-1.5 text-[11px]">
+                  <button type="button" onclick="loadEgfrPreset('normal')" class="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-medium text-center">
+                    Thận bình thường
+                  </button>
+                  <button type="button" onclick="loadEgfrPreset('moderate')" class="p-1.5 rounded-lg bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 text-amber-800 dark:text-amber-300 font-medium text-center">
+                    Suy thận độ 3
+                  </button>
+                  <button type="button" onclick="loadEgfrPreset('severe')" class="p-1.5 rounded-lg bg-red-50 dark:bg-red-950/40 hover:bg-red-100 text-red-800 dark:text-red-300 font-medium text-center">
+                    Suy thận nặng
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: Real-time Clinical Results & Dose Adjustments -->
+            <div class="lg:col-span-7 space-y-4">
+              <!-- Result Cards Grid -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <!-- Cockcroft-Gault Card (Primary for Drug Dosing) -->
+                <div class="bg-gradient-to-br from-teal-500/10 to-teal-500/5 dark:from-teal-950/40 dark:to-slate-900 p-4 rounded-2xl border-2 border-teal-500/30 dark:border-teal-500/40 relative overflow-hidden">
+                  <div class="flex items-center justify-between text-xs font-semibold text-teal-800 dark:text-teal-300 mb-1">
+                    <span class="flex items-center gap-1.5">
+                      <i data-lucide="check-circle" class="w-4 h-4 text-teal-600"></i>
+                      Cockcroft-Gault (CrCl)
+                    </span>
+                    <span class="text-[10px] px-1.5 py-0.5 rounded bg-teal-200/60 dark:bg-teal-900 text-teal-900 dark:text-teal-200 font-bold">Chỉnh liều thuốc</span>
+                  </div>
+                  <div class="mt-2 flex items-baseline gap-2">
+                    <span id="crcl-result-value" class="text-3xl sm:text-4xl font-extrabold text-teal-700 dark:text-teal-300 font-mono-calc">42.5</span>
+                    <span class="text-xs font-bold text-slate-500">mL/phút</span>
+                  </div>
+                  <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1.5">
+                    Được FDA & Dược thư khuyến cáo dùng để chỉnh liều kháng sinh & thuốc thải qua thận.
+                  </p>
+                </div>
+
+                <!-- CKD-EPI 2021 Card -->
+                <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 relative overflow-hidden">
+                  <div class="flex items-center justify-between text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                    <span>CKD-EPI 2021 (eGFR)</span>
+                    <span class="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">KDIGO</span>
+                  </div>
+                  <div class="mt-2 flex items-baseline gap-2">
+                    <span id="ckdepi-result-value" class="text-3xl sm:text-4xl font-extrabold text-slate-800 dark:text-white font-mono-calc">46.8</span>
+                    <span class="text-xs font-bold text-slate-500">mL/phút/1.73m²</span>
+                  </div>
+                  <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1.5">
+                    Đánh giá chức năng thận tổng thể theo phân loại bệnh thận mạn.
+                  </p>
+                </div>
+              </div>
+
+              <!-- KDIGO Staging & Alert Banner -->
+              <div id="kdigo-stage-card" class="p-4 rounded-2xl border transition-all duration-300 bg-amber-50 dark:bg-amber-950/30 border-amber-300 dark:border-amber-800 text-amber-900 dark:text-amber-200">
+                <div class="flex items-start gap-3">
+                  <div id="kdigo-icon-wrap" class="p-2 rounded-xl bg-amber-100 dark:bg-amber-900/60 text-amber-700 dark:text-amber-300">
+                    <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+                  </div>
+                  <div class="flex-1">
+                    <div class="flex items-center justify-between">
+                      <span id="kdigo-stage-title" class="font-bold text-sm">Giai đoạn G3a: Giảm mức lọc cầu thận nhẹ đến vừa</span>
+                      <span id="kdigo-badge" class="text-xs px-2 py-0.5 rounded-full font-bold bg-amber-200 dark:bg-amber-900 text-amber-900 dark:text-amber-100">G3a</span>
+                    </div>
+                    <p id="kdigo-clinical-advice" class="text-xs text-amber-800/90 dark:text-amber-200/90 mt-1 leading-relaxed">
+                      Cần giảm liều một số kháng sinh bài tiết qua thận. Tránh các thuốc độc thận liều cao (NSAIDs, Aminoglycoside nếu không thật sự cần thiết).
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Drug Specific Adjustment Table for this eGFR -->
+              <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-800 shadow-xs">
+                <div class="flex items-center justify-between mb-3">
+                  <h4 class="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
+                    <i data-lucide="shield-check" class="w-4 h-4 text-teal-600"></i>
+                    Khuyến cáo Chỉnh Liều Thuốc Lâm Sàng cho Mức CrCl này:
+                  </h4>
+                  <span class="text-[11px] text-slate-400">Tự động cập nhật</span>
+                </div>
+
+                <div class="overflow-x-auto">
+                  <table class="w-full text-left text-xs">
+                    <thead>
+                      <tr class="border-b border-slate-100 dark:border-slate-800 text-slate-400">
+                        <th class="pb-2 font-semibold">Nhóm thuốc</th>
+                        <th class="pb-2 font-semibold">Tên thuốc</th>
+                        <th class="pb-2 font-semibold">Hướng dẫn chỉnh liều theo CrCl</th>
+                        <th class="pb-2 font-semibold text-right">Mức độ cảnh báo</th>
+                      </tr>
+                    </thead>
+                    <tbody id="drug-adjustment-tbody" class="divide-y divide-slate-100 dark:divide-slate-800/60">
+                      <!-- Dynamic rows based on CrCl -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SUBTAB 2: EMERGENCY & COMMON DRUG FORMULARY -->
+        <div id="drug-list-view" class="hidden space-y-4">
+          <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-800">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-3 mb-4">
+              <h3 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <i data-lucide="book-open" class="w-4 h-4 text-teal-600"></i>
+                Bảng Pha & Dùng Thuốc Cấp cứu / Hồi sức
+              </h3>
+              <input type="text" id="drug-search-input" oninput="filterDrugList()" placeholder="Tìm nhanh: Adrenalin, Noradrenalin, Lovenox..." class="w-full sm:w-64 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs">
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3" id="drug-cards-container">
+              <!-- Populated by JavaScript -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- TAB 5: BÁO CÁO GIAO BAN & CA TRỰC -->
+      <!-- ========================================== -->
+      <section id="tab-briefing" class="tab-content hidden space-y-4">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-xs">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div>
+              <h2 class="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <i data-lucide="clipboard-list" class="w-6 h-6 text-teal-600"></i>
+                Sổ Báo Cáo Giao Ban Ca Trực
+              </h2>
+              <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+                Ghi chép số liệu ca trực, bàn giao bệnh nhân nặng và xuất nội dung 1 chạm để gửi Zalo khoa hoặc in báo cáo.
+              </p>
+            </div>
+            <div class="flex items-center gap-2 w-full sm:w-auto">
+              <button onclick="copyBriefingText()" class="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3.5 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-semibold shadow-sm transition active:scale-95">
+                <i data-lucide="copy" class="w-4 h-4"></i>
+                <span>Copy gửi Zalo / Báo cáo</span>
+              </button>
+              <button onclick="window.print()" class="p-2 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800" title="In báo cáo giao ban">
+                <i data-lucide="printer" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+          <!-- Form Input -->
+          <div class="lg:col-span-6 bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-800 space-y-4 text-xs">
+            <h3 class="font-bold text-slate-800 dark:text-slate-200 border-b border-slate-100 dark:border-slate-800 pb-2">
+              Nhập Số Liệu Ca Trực
+            </h3>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block font-semibold text-slate-600 dark:text-slate-400 mb-1">Ngày trực</label>
+                <input type="date" id="brief-date" class="w-full px-2.5 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs">
+              </div>
+              <div>
+                <label class="block font-semibold text-slate-600 dark:text-slate-400 mb-1">Kíp trực</label>
+                <input type="text" id="brief-team" value="BS. Trực chính + ĐD. Trực" class="w-full px-2.5 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs">
+              </div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl space-y-2">
+              <span class="font-bold text-slate-700 dark:text-slate-300 block">Thống kê số lượng:</span>
+              <div class="grid grid-cols-3 gap-2">
+                <div>
+                  <span class="text-[11px] text-slate-500">Tổng số BN:</span>
+                  <input type="number" id="brief-total" value="45" oninput="updateBriefingPreview()" class="w-full mt-1 px-2 py-1.5 rounded border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-bold">
+                </div>
+                <div>
+                  <span class="text-[11px] text-slate-500">Vào viện mới:</span>
+                  <input type="number" id="brief-admissions" value="8" oninput="updateBriefingPreview()" class="w-full mt-1 px-2 py-1.5 rounded border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-bold text-emerald-600">
+                </div>
+                <div>
+                  <span class="text-[11px] text-slate-500">Ra viện / Chuyển:</span>
+                  <input type="number" id="brief-discharges" value="5" oninput="updateBriefingPreview()" class="w-full mt-1 px-2 py-1.5 rounded border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-bold text-blue-600">
+                </div>
+                <div>
+                  <span class="text-[11px] text-slate-500">Mổ cấp cứu:</span>
+                  <input type="number" id="brief-emerg-surgeries" value="2" oninput="updateBriefingPreview()" class="w-full mt-1 px-2 py-1.5 rounded border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-bold text-amber-600">
+                </div>
+                <div>
+                  <span class="text-[11px] text-slate-500">Mổ phiên:</span>
+                  <input type="number" id="brief-sched-surgeries" value="6" oninput="updateBriefingPreview()" class="w-full mt-1 px-2 py-1.5 rounded border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-bold">
+                </div>
+                <div>
+                  <span class="text-[11px] text-slate-500">Tử vong:</span>
+                  <input type="number" id="brief-deaths" value="0" oninput="updateBriefingPreview()" class="w-full mt-1 px-2 py-1.5 rounded border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-bold text-red-600">
+                </div>
+              </div>
+            </div>
+
+            <!-- Heavy Patients & Incident Details -->
+            <div>
+              <label class="block font-semibold text-slate-600 dark:text-slate-400 mb-1">Danh sách BN nặng / Cần xin ý kiến giao ban:</label>
+              <textarea id="brief-heavy-patients" rows="4" oninput="updateBriefingPreview()" class="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs" placeholder="1. BN Trần Văn B (62t) - Giường 12: Hậu phẫu cắt túi mật N1, dẫn lưu ra 50ml dịch hồng, mạch 85, SpO2 98%...&#10;2. BN Lê Thị C (75t) - Giường 04: Viêm phổi nặng / ĐTĐ typ 2, sốt 38.8C..."></textarea>
+            </div>
+
+            <div>
+              <label class="block font-semibold text-slate-600 dark:text-slate-400 mb-1">Vấn đề hành chính / Trang thiết bị hỏng / Sự cố:</label>
+              <textarea id="brief-incidents" rows="2" oninput="updateBriefingPreview()" class="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs" placeholder="Máy hút đờm phòng 302 hoạt động chập chờn, đã báo phòng Vật tư sửa chữa..."></textarea>
+            </div>
+          </div>
+
+          <!-- Preview & Copy Area -->
+          <div class="lg:col-span-6 bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2 mb-3">
+                <span class="text-xs font-bold text-slate-700 dark:text-slate-300">Xem trước văn bản xuất ra:</span>
+                <span class="text-[11px] px-2 py-0.5 rounded bg-teal-100 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300 font-semibold">Định dạng chuẩn Zalo</span>
+              </div>
+              <pre id="briefing-preview-text" class="whitespace-pre-wrap font-mono-calc text-xs p-3.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 max-h-[460px] overflow-y-auto leading-relaxed select-all"></pre>
+            </div>
+            
+            <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex justify-end">
+              <button onclick="copyBriefingText()" class="w-full sm:w-auto px-4 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-sm transition">
+                <i data-lucide="check" class="w-4 h-4"></i>
+                <span>Sao chép toàn bộ nội dung</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- TAB 6: KHÁC & THANG ĐIỂM LÂM SÀNG -->
+      <!-- ========================================== -->
+      <section id="tab-misc" class="tab-content hidden space-y-4">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-xs">
+          <h2 class="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <i data-lucide="folder" class="w-6 h-6 text-teal-600"></i>
+            Thang Điểm & Tiện Ích Lâm Sàng Khác
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+            Tra cứu nhanh các thang điểm đánh giá lâm sàng phổ biến khi đi buồng hoặc phân loại tại cấp cứu.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Glasgow Coma Scale -->
+          <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-3">
+            <div class="flex items-center justify-between">
+              <h3 class="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-1.5">
+                <i data-lucide="brain" class="w-4 h-4 text-purple-600"></i>
+                Thang điểm Glasgow (GCS)
+              </h3>
+              <span id="gcs-total" class="px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/60 text-purple-700 dark:text-purple-300 text-xs font-bold">15 Điểm</span>
+            </div>
+            <div class="space-y-2 text-xs">
+              <div>
+                <label class="text-[11px] text-slate-500 block mb-0.5">Mắt (Eye - E):</label>
+                <select id="gcs-eye" onchange="calcGcs()" class="w-full p-1.5 rounded border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs">
+                  <option value="4">4 - Mở tự nhiên</option>
+                  <option value="3">3 - Mở khi gọi</option>
+                  <option value="2">2 - Mở khi gây đau</option>
+                  <option value="1">1 - Không mở</option>
+                </select>
+              </div>
+              <div>
+                <label class="text-[11px] text-slate-500 block mb-0.5">Lời nói (Verbal - V):</label>
+                <select id="gcs-verbal" onchange="calcGcs()" class="w-full p-1.5 rounded border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs">
+                  <option value="5">5 - Trả lời đúng, rõ ràng</option>
+                  <option value="4">4 - Trả lời lú lẫn</option>
+                  <option value="3">3 - Nói từ vô nghĩa</option>
+                  <option value="2">2 - Kêu rên ú ớ</option>
+                  <option value="1">1 - Không đáp ứng</option>
+                </select>
+              </div>
+              <div>
+                <label class="text-[11px] text-slate-500 block mb-0.5">Vận động (Motor - M):</label>
+                <select id="gcs-motor" onchange="calcGcs()" class="w-full p-1.5 rounded border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs">
+                  <option value="6">6 - Làm theo y lệnh</option>
+                  <option value="5">5 - Định vị đúng chỗ đau</option>
+                  <option value="4">4 - Co tay gạt khi đau</option>
+                  <option value="3">3 - Co cứng mất vỏ</option>
+                  <option value="2">2 - Duỗi cứng mất não</option>
+                  <option value="1">1 - Không đáp ứng</option>
+                </select>
+              </div>
+            </div>
+            <div id="gcs-eval" class="p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 text-[11px] font-medium">
+              Tri giác bình thường (15 điểm)
+            </div>
+          </div>
+
+          <!-- CURB-65 Pneumonia -->
+          <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-3">
+            <div class="flex items-center justify-between">
+              <h3 class="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-1.5">
+                <i data-lucide="wind" class="w-4 h-4 text-cyan-600"></i>
+                Thang điểm CURB-65
+              </h3>
+              <span id="curb-total" class="px-2 py-0.5 rounded-full bg-cyan-100 dark:bg-cyan-900/60 text-cyan-700 dark:text-cyan-300 text-xs font-bold">0 Điểm</span>
+            </div>
+            <p class="text-[11px] text-slate-400">Đánh giá độ nặng viêm phổi cộng đồng:</p>
+            <div class="space-y-1.5 text-xs">
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" id="curb-c" onchange="calcCurb()" class="rounded text-teal-600">
+                <span><b>C</b> - Confusion (Lú lẫn, mất định hướng)</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" id="curb-u" onchange="calcCurb()" class="rounded text-teal-600">
+                <span><b>U</b> - Ure máu &gt; 7 mmol/L (BUN &gt; 19 mg/dL)</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" id="curb-r" onchange="calcCurb()" class="rounded text-teal-600">
+                <span><b>R</b> - Nhịp thở &ge; 30 lần/phút</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" id="curb-b" onchange="calcCurb()" class="rounded text-teal-600">
+                <span><b>B</b> - HA tâm thu &lt; 90 hoặc tâm trương &le; 60</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" id="curb-65" onchange="calcCurb()" class="rounded text-teal-600">
+                <span><b>65</b> - Tuổi &ge; 65</span>
+              </label>
+            </div>
+            <div id="curb-eval" class="p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 text-[11px] font-medium">
+              Nguy cơ thấp (Nhóm 1): Điều trị ngoại trú
+            </div>
+          </div>
+
+          <!-- Doctor's Personal Note Scratchpad -->
+          <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 flex flex-col justify-between space-y-2">
+            <div>
+              <div class="flex items-center justify-between">
+                <h3 class="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-1.5">
+                  <i data-lucide="edit-3" class="w-4 h-4 text-amber-500"></i>
+                  Sổ Ghi Chú Nhanh Bác Sĩ
+                </h3>
+                <span class="text-[10px] text-slate-400">Tự lưu</span>
+              </div>
+              <textarea id="doctor-scratchpad" rows="8" placeholder="Ghi chú nhanh ca trực, số điện thoại người nhà, lời dặn của thầy..." class="mt-2 w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs focus:ring-1 focus:ring-teal-500 outline-none"></textarea>
+            </div>
+            <div class="flex justify-between items-center text-[11px] text-slate-400">
+              <span id="scratchpad-status">Đã lưu tự động</span>
+              <button onclick="clearScratchpad()" class="hover:text-red-500">Xóa trắng</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- MOBILE BOTTOM NAVIGATION BAR -->
+  <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 flex justify-around py-1.5 px-1 shadow-lg">
+    <!-- Populated by JS -->
+  </nav>
+
+  <!-- MODAL: LIGHTBOX ECG IMAGE FULLSCREEN VIEWER -->
+  <div id="lightbox-modal" class="fixed inset-0 z-50 bg-black/90 hidden backdrop-blur-sm flex flex-col items-center justify-between p-3">
+    <!-- Top toolbar -->
+    <div class="w-full flex items-center justify-between text-white py-2 px-3">
+      <div class="flex items-center gap-2">
+        <i data-lucide="file-text" class="w-5 h-5 text-teal-400"></i>
+        <span id="lightbox-title" class="text-sm font-semibold truncate max-w-[200px] sm:max-w-md">Ảnh ECG</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="zoomLightbox(0.2)" class="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white" title="Phóng to">
+          <i data-lucide="zoom-in" class="w-5 h-5"></i>
+        </button>
+        <button onclick="zoomLightbox(-0.2)" class="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white" title="Thu nhỏ">
+          <i data-lucide="zoom-out" class="w-5 h-5"></i>
+        </button>
+        <button onclick="resetLightboxZoom()" class="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white" title="Khôi phục kích thước">
+          <i data-lucide="maximize-2" class="w-5 h-5"></i>
+        </button>
+        <button onclick="copyLightboxImage()" class="p-2 rounded-lg bg-teal-600 hover:bg-teal-700 text-white" title="Copy ảnh">
+          <i data-lucide="copy" class="w-5 h-5"></i>
+        </button>
+        <a id="lightbox-download-link" href="#" download="ecg-scan.jpg" class="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white" title="Tải về máy">
+          <i data-lucide="download" class="w-5 h-5"></i>
+        </a>
+        <button onclick="closeLightbox()" class="p-2 rounded-lg bg-red-600/80 hover:bg-red-600 text-white ml-2" title="Đóng">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Center image view with zoom -->
+    <div class="flex-1 w-full overflow-auto flex items-center justify-center p-2 relative">
+      <img id="lightbox-img" src="" class="max-h-full max-w-full object-contain transition-transform duration-150 select-none shadow-2xl">
+    </div>
+
+    <div class="text-slate-400 text-xs py-1">
+      Gợi ý: Dùng nút phóng to/thu nhỏ hoặc cuộn chuột để soi kỹ từng vạch milimet trên giấy điện tim.
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toast-container" class="fixed bottom-20 md:bottom-6 right-6 z-50 space-y-2 pointer-events-none"></div>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    // -------------------------------------------------------------
+    // TABS DEFINITION & NAVIGATION
+    // -------------------------------------------------------------
+    const TABS = [
+      { id: 'tab-ecg-gallery', name: 'Hình ảnh ECG', icon: 'image', badge: '30 ngày' },
+      { id: 'tab-ai-ecg', name: 'AI Đọc ECG', icon: 'sparkles', badge: 'AI' },
+      { id: 'tab-protocols', name: 'Protocol phẫu thuật', icon: 'scissors' },
+      { id: 'tab-drugs', name: 'Sử dụng thuốc & eGFR', icon: 'pill', badge: 'CrCl' },
+      { id: 'tab-briefing', name: 'Báo cáo giao ban', icon: 'clipboard-list' },
+      { id: 'tab-misc', name: 'Thang điểm & Khác', icon: 'folder' },
+    ];
+
+    let currentTab = 'tab-ecg-gallery';
+
+    function initNavigation() {
+      const desktopNav = document.getElementById('desktop-nav');
+      const mobileNav = document.querySelector('nav.md\\:hidden');
+
+      desktopNav.innerHTML = '';
+      mobileNav.innerHTML = '';
+
+      TABS.forEach(tab => {
+        // Desktop button
+        const dBtn = document.createElement('button');
+        dBtn.className = `w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition ${
+          tab.id === currentTab 
+            ? 'bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-300 shadow-xs' 
+            : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+        }`;
+        dBtn.onclick = () => switchTab(tab.id);
+        dBtn.innerHTML = `
+          <div class="flex items-center gap-2.5">
+            <i data-lucide="${tab.icon}" class="w-4 h-4 ${tab.id === currentTab ? 'text-teal-600 dark:text-teal-400' : 'text-slate-400'}"></i>
+            <span>${tab.name}</span>
+          </div>
+          ${tab.badge ? `<span class="text-[10px] px-1.5 py-0.5 rounded-md font-bold ${tab.id === currentTab ? 'bg-teal-200/80 dark:bg-teal-900 text-teal-900 dark:text-teal-100' : 'bg-slate-200 dark:bg-slate-800 text-slate-500'}">${tab.badge}</span>` : ''}
+        `;
+        desktopNav.appendChild(dBtn);
+
+        // Mobile button
+        const mBtn = document.createElement('button');
+        mBtn.className = `flex flex-col items-center justify-center py-1 px-1 rounded-lg transition ${
+          tab.id === currentTab ? 'text-teal-600 dark:text-teal-400' : 'text-slate-400'
+        }`;
+        mBtn.onclick = () => switchTab(tab.id);
+        mBtn.innerHTML = `
+          <i data-lucide="${tab.icon}" class="w-5 h-5 mb-0.5"></i>
+          <span class="text-[10px] font-medium leading-none truncate max-w-[60px]">${tab.name.split(' ')[0]}</span>
+        `;
+        mobileNav.appendChild(mBtn);
+      });
+
+      lucide.createIcons();
+    }
+
+    function switchTab(tabId) {
+      currentTab = tabId;
+      document.querySelectorAll('.tab-content').forEach(el => {
+        el.classList.add('hidden');
+        el.classList.remove('active');
+      });
+      const activeEl = document.getElementById(tabId);
+      if (activeEl) {
+        activeEl.classList.remove('hidden');
+        activeEl.classList.add('active');
+      }
+      initNavigation();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // -------------------------------------------------------------
+    // TOAST NOTIFICATIONS
+    // -------------------------------------------------------------
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      const bgColors = {
+        info: 'bg-slate-900 text-white',
+        success: 'bg-emerald-600 text-white',
+        warning: 'bg-amber-600 text-white',
+        error: 'bg-red-600 text-white'
+      };
+      toast.className = `${bgColors[type] || bgColors.info} px-4 py-2.5 rounded-xl shadow-lg text-xs font-semibold flex items-center gap-2 transform transition-all duration-300 opacity-0 translate-y-2 pointer-events-auto`;
+      toast.innerHTML = `
+        <i data-lucide="${type === 'success' ? 'check-circle' : type === 'warning' ? 'alert-circle' : 'info'}" class="w-4 h-4"></i>
+        <span>${message}</span>
+      `;
+      container.appendChild(toast);
+      lucide.createIcons();
+
+      requestAnimationFrame(() => {
+        toast.classList.remove('opacity-0', 'translate-y-2');
+      });
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    // -------------------------------------------------------------
+    // THEME (DARK / LIGHT) & LOCAL STORAGE INIT
+    // -------------------------------------------------------------
+    const themeToggle = document.getElementById('theme-toggle');
+    themeToggle.addEventListener('click', () => {
+      document.documentElement.classList.toggle('dark');
+      const isDark = document.documentElement.classList.contains('dark');
+      localStorage.setItem('clinical_desk_theme', isDark ? 'dark' : 'light');
+    });
+
+    if (localStorage.getItem('clinical_desk_theme') === 'dark' || (!('clinical_desk_theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    }
+
+    // -------------------------------------------------------------
+    // TAB 1: ECG GALLERY & 30-DAY AUTO-PURGE
+    // -------------------------------------------------------------
+    const STORAGE_KEY_ECG = 'clinical_desk_ecgs_v1';
+    let ecgList = [];
+
+    function loadECGs() {
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY_ECG);
+        ecgList = stored ? JSON.parse(stored) : [];
+      } catch (e) {
+        console.error('Error loading ECGs:', e);
+        ecgList = [];
+      }
+      autoPurgeOldECGs();
+      renderECGGallery();
+    }
+
+    function saveECGs() {
+      try {
+        localStorage.setItem(STORAGE_KEY_ECG, JSON.stringify(ecgList));
+      } catch (e) {
+        showToast('Bộ nhớ trình duyệt gần đầy. Hãy xóa bớt một số ảnh cũ!', 'warning');
+      }
+      updateCounts();
+    }
+
+    function autoPurgeOldECGs() {
+      const now = Date.now();
+      const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
+      let purgedCount = 0;
+
+      ecgList = ecgList.filter(item => {
+        if (item.pinned) return true; // Never delete pinned
+        const age = now - item.createdAt;
+        if (age > THIRTY_DAYS_MS) {
+          purgedCount++;
+          return false;
+        }
+        return true;
+      });
+
+      if (purgedCount > 0) {
+        saveECGs();
+        showToast(`Đã tự động dọn dẹp ${purgedCount} ảnh quá hạn 30 ngày để tiết kiệm dung lượng.`, 'info');
+      }
+    }
+
+    function calculateDaysRemaining(createdAt) {
+      const now = Date.now();
+      const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
+      const msLeft = (createdAt + THIRTY_DAYS_MS) - now;
+      const days = Math.ceil(msLeft / (1000 * 60 * 60 * 24));
+      return days > 0 ? days : 0;
+    }
+
+    // Render Gallery
+    let currentFilter = 'all';
+
+    function filterECG(filter) {
+      currentFilter = filter;
+      document.querySelectorAll('.ecg-filter-btn').forEach(b => {
+        b.classList.remove('bg-teal-100', 'text-teal-800', 'dark:bg-teal-900/60', 'dark:text-teal-200', 'font-medium');
+        b.classList.add('text-slate-600', 'dark:text-slate-400');
+        if (b.dataset.filter === filter) {
+          b.classList.add('bg-teal-100', 'text-teal-800', 'dark:bg-teal-900/60', 'dark:text-teal-200', 'font-medium');
+          b.classList.remove('text-slate-600', 'dark:text-slate-400');
+        }
+      });
+      renderECGGallery();
+    }
+
+    function renderECGGallery() {
+      const grid = document.getElementById('ecg-gallery-grid');
+      const empty = document.getElementById('ecg-empty-state');
+      const search = (document.getElementById('ecg-search-input').value || '').toLowerCase();
+
+      let items = ecgList.filter(item => {
+        const matchesSearch = item.patientName.toLowerCase().includes(search) || 
+                              item.diagnosis.toLowerCase().includes(search) || 
+                              item.notes.toLowerCase().includes(search);
+        if (!matchesSearch) return false;
+
+        if (currentFilter === 'pinned') return item.pinned;
+        if (currentFilter === 'expiring') {
+          const days = calculateDaysRemaining(item.createdAt);
+          return days <= 5 && !item.pinned;
+        }
+        return true;
+      });
+
+      updateCounts();
+
+      if (items.length === 0) {
+        grid.innerHTML = '';
+        empty.classList.remove('hidden');
+        return;
+      }
+      empty.classList.add('hidden');
+
+      grid.innerHTML = items.map(item => {
+        const daysLeft = calculateDaysRemaining(item.createdAt);
+        const dateStr = new Date(item.createdAt).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+        
+        let badgeClass = 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300';
+        let badgeText = `Còn ${daysLeft} ngày`;
+
+        if (item.pinned) {
+          badgeClass = 'bg-teal-100 text-teal-800 dark:bg-teal-950 dark:text-teal-300';
+          badgeText = 'Đã ghim vĩnh viễn';
+        } else if (daysLeft <= 3) {
+          badgeClass = 'bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300 animate-pulse';
+          badgeText = `Gần hết hạn: ${daysLeft} ngày`;
+        } else if (daysLeft <= 7) {
+          badgeClass = 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300';
+          badgeText = `Còn ${daysLeft} ngày`;
+        }
+
+        return `
+          <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-xs hover:shadow-md transition flex flex-col justify-between">
+            <div>
+              <!-- Image container -->
+              <div class="relative bg-slate-950 h-44 cursor-pointer overflow-hidden group" onclick="openLightbox('${item.dataUrl}', '${item.patientName} - ${item.diagnosis}')">
+                <img src="${item.dataUrl}" class="w-full h-full object-cover group-hover:scale-105 transition duration-200" alt="ECG">
+                <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xs font-semibold gap-1">
+                  <i data-lucide="zoom-in" class="w-4 h-4"></i> Phóng to xem vạch
+                </div>
+                <!-- Top Badge: Days remaining / Pinned -->
+                <div class="absolute top-2 left-2 px-2 py-0.5 rounded-full text-[10px] font-bold ${badgeClass}">
+                  ${badgeText}
+                </div>
+                <!-- Pin button on image -->
+                <button onclick="event.stopPropagation(); togglePinECG('${item.id}')" class="absolute top-2 right-2 p-1.5 rounded-full bg-black/60 text-white hover:text-amber-400 transition" title="${item.pinned ? 'Bỏ ghim' : 'Ghim lưu giữ lâu dài'}">
+                  <i data-lucide="bookmark" class="w-3.5 h-3.5 ${item.pinned ? 'fill-amber-400 text-amber-400' : ''}"></i>
+                </button>
+              </div>
+
+              <!-- Metadata Info -->
+              <div class="p-3.5">
+                <div class="flex items-start justify-between gap-1">
+                  <h4 class="font-bold text-sm text-slate-900 dark:text-white truncate">${item.patientName || 'BN Ẩn danh'}</h4>
+                  <span class="text-[10px] text-slate-400 shrink-0">${dateStr}</span>
+                </div>
+                <p class="text-xs font-semibold text-teal-600 dark:text-teal-400 mt-0.5 truncate">${item.diagnosis || 'Chưa phân loại'}</p>
+                ${item.notes ? `<p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">${item.notes}</p>` : ''}
+              </div>
+            </div>
+
+            <!-- Bottom Actions -->
+            <div class="px-3 py-2 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
+              <button onclick="sendToAiReader('${item.id}')" class="text-purple-600 hover:text-purple-700 font-semibold flex items-center gap-1">
+                <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+                <span>Đưa vào AI đọc</span>
+              </button>
+              
+              <div class="flex items-center gap-1">
+                <button onclick="copyImageToClipboard('${item.dataUrl}')" class="p-1.5 rounded hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500" title="Copy ảnh">
+                  <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                </button>
+                <a href="${item.dataUrl}" download="${item.patientName || 'ECG'}-${item.id}.jpg" class="p-1.5 rounded hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500" title="Tải về máy">
+                  <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                </a>
+                <button onclick="deleteECG('${item.id}')" class="p-1.5 rounded hover:bg-red-100 dark:hover:bg-red-950 text-red-500" title="Xóa ảnh này">
+                  <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      lucide.createIcons();
+    }
+
+    function updateCounts() {
+      document.getElementById('count-all').innerText = ecgList.length;
+      document.getElementById('count-pinned').innerText = ecgList.filter(x => x.pinned).length;
+      document.getElementById('count-expiring').innerText = ecgList.filter(x => calculateDaysRemaining(x.createdAt) <= 5 && !x.pinned).length;
+    }
+
+    function togglePinECG(id) {
+      const item = ecgList.find(x => x.id === id);
+      if (item) {
+        item.pinned = !item.pinned;
+        saveECGs();
+        renderECGGallery();
+        showToast(item.pinned ? 'Đã ghim ảnh (Không tự động xóa sau 30 ngày)' : 'Đã bỏ ghim (Sẽ tự xóa sau 30 ngày)', 'info');
+      }
+    }
+
+    function deleteECG(id) {
+      if (confirm('Bác sĩ có chắc muốn xóa ảnh này không?')) {
+        ecgList = ecgList.filter(x => x.id !== id);
+        saveECGs();
+        renderECGGallery();
+        showToast('Đã xóa ảnh thành công', 'success');
+      }
+    }
+
+    // Handle File Upload from phone or desktop (Gallery or Camera)
+    function processUploadedFiles(files, isCamera = false) {
+      if (!files || files.length === 0) return;
+
+      Array.from(files).forEach((file, index) => {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          const defaultName = 'BN ' + (ecgList.length + 1);
+          const patientName = prompt('Nhập tên/mã bệnh nhân (Có thể để trống):', defaultName) || defaultName;
+          const newItem = {
+            id: 'ecg_' + Date.now() + '_' + index,
+            patientName: patientName,
+            diagnosis: 'Điện tâm đồ mới tải',
+            notes: (isCamera ? 'Chụp từ Camera lúc ' : 'Tải từ Thư viện ảnh lúc ') + new Date().toLocaleTimeString('vi-VN'),
+            dataUrl: event.target.result,
+            createdAt: Date.now(),
+            pinned: false
+          };
+          ecgList.unshift(newItem);
+          saveECGs();
+          renderECGGallery();
+          showToast('Đã lưu ảnh mới thành công (Tự động xóa sau 30 ngày)', 'success');
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    const galleryInput = document.getElementById('ecg-gallery-input');
+    const cameraInput = document.getElementById('ecg-camera-input');
+
+    if (galleryInput) {
+      galleryInput.addEventListener('change', function(e) {
+        processUploadedFiles(e.target.files, false);
+        this.value = '';
+      });
+    }
+
+    if (cameraInput) {
+      cameraInput.addEventListener('change', function(e) {
+        processUploadedFiles(e.target.files, true);
+        this.value = '';
+      });
+    }
+
+    document.getElementById('ecg-search-input').addEventListener('input', renderECGGallery);
+
+    // Copy image directly to system clipboard
+    async function copyImageToClipboard(dataUrl) {
+      try {
+        const res = await fetch(dataUrl);
+        const blob = await res.blob();
+        await navigator.clipboard.write([
+          new ClipboardItem({ [blob.type]: blob })
+        ]);
+        showToast('Đã sao chép ảnh vào Clipboard! Bạn có thể dán (Ctrl+V) thẳng vào Word hoặc PowerPoint.', 'success');
+      } catch (err) {
+        showToast('Trình duyệt chưa cấp quyền copy ảnh trực tiếp, bạn hãy dùng nút Tải về nhé.', 'warning');
+      }
+    }
+
+    // -------------------------------------------------------------
+    // LIGHTBOX FULLSCREEN VIEWER
+    // -------------------------------------------------------------
+    let currentZoom = 1;
+    const lightboxModal = document.getElementById('lightbox-modal');
+    const lightboxImg = document.getElementById('lightbox-img');
+    const lightboxTitle = document.getElementById('lightbox-title');
+    const lightboxDownload = document.getElementById('lightbox-download-link');
+
+    function openLightbox(src, title) {
+      lightboxImg.src = src;
+      lightboxTitle.innerText = title || 'Ảnh ECG chi tiết';
+      lightboxDownload.href = src;
+      currentZoom = 1;
+      lightboxImg.style.transform = `scale(1)`;
+      lightboxModal.classList.remove('hidden');
+    }
+
+    function closeLightbox() {
+      lightboxModal.classList.add('hidden');
+    }
+
+    function zoomLightbox(delta) {
+      currentZoom = Math.max(0.5, Math.min(4, currentZoom + delta));
+      lightboxImg.style.transform = `scale(${currentZoom})`;
+    }
+
+    function resetLightboxZoom() {
+      currentZoom = 1;
+      lightboxImg.style.transform = `scale(1)`;
+    }
+
+    function copyLightboxImage() {
+      copyImageToClipboard(lightboxImg.src);
+    }
+
+    // -------------------------------------------------------------
+    // TAB 2: AI ECG READER & CLINICAL INTERPRETATION
+    // -------------------------------------------------------------
+    const SAMPLE_CASES = {
+      stemi: {
+        name: 'BN Lê Văn H (58t) - Đau ngực giờ thứ 2',
+        title: 'Nhồi máu cơ tim cấp thành trước rộng (Anterior STEMI)',
+        rate: 88,
+        rhythm: 'Nhịp xoang (Sinus Rhythm)',
+        axis: 'Trục trung gian (+45°)',
+        intervals: { pr: '160 ms (Bình thường)', qrs: '90 ms (Bình thường)', qt: '420 ms', qtc: '450 ms (Bình thường)' },
+        findings: [
+          'Đoạn ST chênh lên dạng vòm ≥ 3mm ở các chuyển đạo V1, V2, V3, V4.',
+          'Sóng T cao nhọn đối xứng (Hyperacute T wave) kèm theo ở V2-V3.',
+          'Hình ảnh soi gương (Reciprocal ST depression): ST chênh xuống 1mm ở chuyển đạo DII, DIII, aVF.',
+          'Không thấy block nhánh hay rối loạn dẫn truyền nhĩ thất.'
+        ],
+        diagnosis: 'NMCT CẤP ST CHÊNH LÊN THÀNH TRƯỚC RỘNG (ANTERIOR STEMI) - CẤP CỨU ĐỘ I',
+        urgency: 'critical',
+        recommendations: [
+          'Báo động đỏ Can thiệp Mạch vành (Cath-lab Activation khẩn cấp).',
+          'Liều nạp kháng kết tập tiểu cầu kép: Aspirin 300mg + Ticagrelor 180mg (hoặc Clopidogrel 300-600mg).',
+          'Giảm đau Morphine TM nếu đau ngực nhiều, theo dõi sát SpO2 và HA.',
+          'Sẵn sàng máy sốc điện đề phòng rung thất (VF).'
+        ]
+      },
+      afib: {
+        name: 'BN Trần Thị M (72t) - Hồi hộp trống ngực, khó thở',
+        title: 'Rung nhĩ đáp ứng thất nhanh (AFib with RVR)',
+        rate: 142,
+        rhythm: 'Rung nhĩ (Atrial Fibrillation) - Khoảng R-R hoàn toàn không đều',
+        axis: 'Trục trung gian (+60°)',
+        intervals: { pr: 'Không xác định được (Mất sóng P, thay bằng sóng f lăn tăn)', qrs: '84 ms', qt: '320 ms', qtc: '490 ms (Kéo dài nhẹ)' },
+        findings: [
+          'Mất hoàn toàn sóng P xoang trên tất cả 12 chuyển đạo.',
+          'Thay thế bằng các sóng lăn tăn f tần số khoảng 400 - 600 ck/phút.',
+          'Khoảng R-R hoàn toàn không đều (Irregularly irregular).',
+          'Tần số thất trung bình nhanh dao động 135 - 150 ck/phút.',
+          'Không có biến đổi ST thiếu máu cục bộ cấp tính rõ rệt.'
+        ],
+        diagnosis: 'RUNG NHĨ ĐÁP ỨNG THẤT NHANH (ATRIAL FIBRILLATION WITH RVR)',
+        urgency: 'warning',
+        recommendations: [
+          'Kiểm soát tần số thất: Cân nhắc Chẹn Beta (Metoprolol/Bisoprolol) hoặc Diltiazem TM nếu huyết động ổn định.',
+          'Đánh giá huyết động: Nếu có tụt huyết áp hoặc đau ngực cấp -> Chuẩn bị Sốc điện chuyển nhịp đồng bộ.',
+          'Tính thang điểm CHA2DS2-VASc để chỉ định kháng đông dự phòng đột quỵ (DOAC / Warfarin).'
+        ]
+      },
+      lbbb: {
+        name: 'BN Hoàng Minh T (69t) - Tiền sử Suy tim / THA',
+        title: 'Block nhánh trái hoàn toàn (Complete LBBB)',
+        rate: 74,
+        rhythm: 'Nhịp xoang',
+        axis: 'Trục lệch trái (-30°)',
+        intervals: { pr: '180 ms', qrs: '148 ms (QRS giãn rộng > 120ms)', qt: '440 ms', qtc: '460 ms' },
+        findings: [
+          'Phức bộ QRS giãn rộng điển hình: Thời gian 148 ms (> 120 ms).',
+          'Sóng R rộng có khấc (notched/M-shaped) ở chuyển đạo bên: DI, aVL, V5, V6.',
+          'Sóng QS hoặc rS sâu, rộng ở V1, V2.',
+          'Biến đổi thứ phát của ST-T: ST chênh xuống và T âm đối xứng ngược hướng với vector QRS ở DI, aVL, V5, V6.'
+        ],
+        diagnosis: 'BLOCK NHÁNH TRÁI HOÀN TOÀN (COMPLETE LBBB)',
+        urgency: 'info',
+        recommendations: [
+          'Nếu mới xuất hiện kèm đau ngực cấp: Phải áp dụng tiêu chuẩn Sgarbossa cải biên để loại trừ STEMI ẩn dấu.',
+          'Đề nghị siêu âm tim đánh giá phân suất tống máu thất trái (LVEF) và vận động vùng.',
+          'Tối ưu hóa điều trị suy tim theo khuyến cáo GDMT.'
+        ]
+      },
+      normal: {
+        name: 'Khám sức khỏe tổng quát (35t)',
+        title: 'Điện tâm đồ nhịp xoang bình thường',
+        rate: 72,
+        rhythm: 'Nhịp xoang đều',
+        axis: 'Trục trung gian (+55°)',
+        intervals: { pr: '150 ms', qrs: '82 ms', qt: '380 ms', qtc: '415 ms' },
+        findings: [
+          'Sóng P dương ở DI, DII, aVF, âm ở aVR. Dẫn truyền nhĩ thất 1:1 bình thường.',
+          'Khoảng PR, QRS, QT trong giới hạn sinh lý bình thường.',
+          'Không có sóng Q bệnh lý, ST không chênh, sóng T bình thường.',
+          'Chỉ số Sokolow-Lyon < 35mm, không có dày thất.'
+        ],
+        diagnosis: 'ĐIỆN TÂM ĐỒ TRONG GIỚI HẠN BÌNH THƯỜNG (NORMAL ECG)',
+        urgency: 'normal',
+        recommendations: [
+          'Không phát hiện bất thường điện học tim.',
+          'Khuyến cáo theo dõi định kỳ.'
+        ]
+      }
+    };
+
+    let currentAiCase = null;
+
+    function loadAiSampleCase(caseKey) {
+      if (!caseKey || !SAMPLE_CASES[caseKey]) return;
+      currentAiCase = SAMPLE_CASES[caseKey];
+      
+      const previewImg = document.getElementById('ai-preview-img');
+      const placeholder = document.getElementById('ai-preview-placeholder');
+      const nameEl = document.getElementById('current-analyzing-name');
+
+      const canvas = document.createElement('canvas');
+      canvas.width = 900;
+      canvas.height = 420;
+      const ctx = canvas.getContext('2d');
+      drawMockEcgCanvas(ctx, caseKey);
+      
+      previewImg.src = canvas.toDataURL('image/png');
+      previewImg.classList.remove('hidden');
+      placeholder.classList.add('hidden');
+      nameEl.innerText = currentAiCase.name;
+
+      runAiEcgAnalysis();
+    }
+
+    function sendToAiReader(ecgId) {
+      const item = ecgList.find(x => x.id === ecgId);
+      if (!item) return;
+
+      switchTab('tab-ai-ecg');
+      const previewImg = document.getElementById('ai-preview-img');
+      const placeholder = document.getElementById('ai-preview-placeholder');
+      const nameEl = document.getElementById('current-analyzing-name');
+
+      previewImg.src = item.dataUrl;
+      previewImg.classList.remove('hidden');
+      placeholder.classList.add('hidden');
+      nameEl.innerText = item.patientName + ' (' + item.diagnosis + ')';
+
+      currentAiCase = SAMPLE_CASES.stemi;
+      runAiEcgAnalysis();
+    }
+
+    function handleAiFileUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        const previewImg = document.getElementById('ai-preview-img');
+        const placeholder = document.getElementById('ai-preview-placeholder');
+        const nameEl = document.getElementById('current-analyzing-name');
+
+        previewImg.src = evt.target.result;
+        previewImg.classList.remove('hidden');
+        placeholder.classList.add('hidden');
+        nameEl.innerText = file.name;
+
+        currentAiCase = SAMPLE_CASES.stemi;
+        runAiEcgAnalysis();
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function drawMockEcgCanvas(ctx, type) {
+      ctx.fillStyle = '#fff7f7';
+      ctx.fillRect(0, 0, 900, 420);
+
+      ctx.strokeStyle = 'rgba(244, 63, 94, 0.15)';
+      ctx.lineWidth = 1;
+      for (let x = 0; x < 900; x += 10) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 420); ctx.stroke();
+      }
+      for (let y = 0; y < 420; y += 10) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(900, y); ctx.stroke();
+      }
+      ctx.strokeStyle = 'rgba(244, 63, 94, 0.4)';
+      ctx.lineWidth = 1.2;
+      for (let x = 0; x < 900; x += 50) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 420); ctx.stroke();
+      }
+      for (let y = 0; y < 420; y += 50) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(900, y); ctx.stroke();
+      }
+
+      ctx.strokeStyle = '#0f172a';
+      ctx.lineWidth = 2;
+      ctx.lineJoin = 'round';
+
+      const leads = ['I', 'II', 'III', 'aVR', 'aVL', 'aVF', 'V1', 'V2', 'V3', 'V4', 'V5', 'V6'];
+      
+      for (let row = 0; row < 3; row++) {
+        for (let col = 0; col < 4; col++) {
+          const leadIdx = row * 4 + col;
+          const leadName = leads[leadIdx];
+          const baseX = col * 225 + 10;
+          const baseY = row * 135 + 75;
+
+          ctx.fillStyle = '#475569';
+          ctx.font = 'bold 12px sans-serif';
+          ctx.fillText(leadName, baseX + 5, baseY - 50);
+
+          ctx.beginPath();
+          let cx = baseX;
+          ctx.moveTo(cx, baseY);
+
+          for (let beat = 0; beat < 2; beat++) {
+            cx += 20; ctx.lineTo(cx, baseY);
+            if (type !== 'afib') {
+              cx += 10; ctx.lineTo(cx, baseY - 8);
+              cx += 10; ctx.lineTo(cx, baseY);
+            } else {
+              cx += 5; ctx.lineTo(cx, baseY + 3);
+              cx += 5; ctx.lineTo(cx, baseY - 3);
+              cx += 5; ctx.lineTo(cx, baseY + 2);
+              cx += 5; ctx.lineTo(cx, baseY);
+            }
+            cx += 15; ctx.lineTo(cx, baseY);
+            cx += 4; ctx.lineTo(cx, baseY + 5);
+            cx += 8; 
+            const rHeight = (type === 'lbbb' && (leadName === 'V5' || leadName === 'V6')) ? 45 : 55;
+            ctx.lineTo(cx, baseY - rHeight);
+            if (type === 'lbbb' && (leadName === 'V5' || leadName === 'V6' || leadName === 'I')) {
+              cx += 5; ctx.lineTo(cx, baseY - rHeight + 10);
+              cx += 5; ctx.lineTo(cx, baseY - rHeight);
+            }
+            cx += 8; ctx.lineTo(cx, baseY + 15);
+            if (type === 'stemi' && ['V1', 'V2', 'V3', 'V4'].includes(leadName)) {
+              cx += 15; ctx.lineTo(cx, baseY - 22);
+              cx += 20; ctx.lineTo(cx, baseY - 30);
+              cx += 20; ctx.lineTo(cx, baseY);
+            } else {
+              cx += 15; ctx.lineTo(cx, baseY);
+              cx += 15; ctx.lineTo(cx, baseY - 12);
+              cx += 15; ctx.lineTo(cx, baseY);
+            }
+            cx += 15; ctx.lineTo(cx, baseY);
+          }
+          ctx.stroke();
+        }
+      }
+
+      ctx.strokeStyle = '#dc2626';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(15, 395);
+      ctx.lineTo(30, 395);
+      ctx.lineTo(30, 345);
+      ctx.lineTo(45, 345);
+      ctx.lineTo(45, 395);
+      ctx.lineTo(60, 395);
+      ctx.stroke();
+      ctx.fillStyle = '#dc2626';
+      ctx.font = '10px monospace';
+      ctx.fillText('10mm/mV 25mm/s', 70, 390);
+    }
+
+    function runAiEcgAnalysis() {
+      const output = document.getElementById('ai-output-content');
+      const indicator = document.getElementById('ai-status-indicator');
+
+      if (!currentAiCase) {
+        showToast('Vui lòng chọn hoặc tải ảnh ECG trước', 'warning');
+        return;
+      }
+
+      indicator.className = 'w-2.5 h-2.5 rounded-full bg-amber-500 animate-ping';
+      output.innerHTML = `
+        <div class="py-12 text-center space-y-3">
+          <div class="inline-block p-3 rounded-full bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 animate-spin">
+            <i data-lucide="loader-2" class="w-8 h-8"></i>
+          </div>
+          <div class="font-bold text-sm text-slate-800 dark:text-slate-200">AI đang quét các chuyển đạo và đo đạc thông số...</div>
+          <p class="text-xs text-slate-400">Trích xuất: Nhịp, trục, khoảng PR, thời gian QRS, QT/QTc và đo độ chênh ST</p>
+        </div>
+      `;
+      lucide.createIcons();
+
+      setTimeout(() => {
+        indicator.className = 'w-2.5 h-2.5 rounded-full bg-emerald-500';
+        renderAiResults(currentAiCase);
+        showToast('Đã phân tích điện tim thành công!', 'success');
+      }, 900);
+    }
+
+    function renderAiResults(data) {
+      const output = document.getElementById('ai-output-content');
+      
+      const urgencyConfig = {
+        critical: { border: 'border-red-500', bg: 'bg-red-50 dark:bg-red-950/40', text: 'text-red-700 dark:text-red-300', badge: 'BÁO ĐỘNG ĐỎ - CẤP CỨU', badgeBg: 'bg-red-600 text-white' },
+        warning: { border: 'border-amber-500', bg: 'bg-amber-50 dark:bg-amber-950/40', text: 'text-amber-700 dark:text-amber-300', badge: 'CẢNH BÁO CAO', badgeBg: 'bg-amber-600 text-white' },
+        info: { border: 'border-blue-500', bg: 'bg-blue-50 dark:bg-blue-950/40', text: 'text-blue-700 dark:text-blue-300', badge: 'THEO DÕI LÂM SÀNG', badgeBg: 'bg-blue-600 text-white' },
+        normal: { border: 'border-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-950/40', text: 'text-emerald-700 dark:text-emerald-300', badge: 'BÌNH THƯỜNG', badgeBg: 'bg-emerald-600 text-white' }
+      }[data.urgency || 'info'];
+
+      output.innerHTML = `
+        <div class="p-4 rounded-xl border-2 ${urgencyConfig.border} ${urgencyConfig.bg} space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded ${urgencyConfig.badgeBg}">${urgencyConfig.badge}</span>
+            <span class="text-xs font-semibold text-slate-500">${data.name}</span>
+          </div>
+          <h4 class="text-base font-extrabold ${urgencyConfig.text} leading-snug">${data.diagnosis}</h4>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+          <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+            <span class="text-slate-400 block text-[10px] uppercase font-semibold">Tần số tim</span>
+            <span class="text-lg font-extrabold text-slate-800 dark:text-white font-mono-calc">${data.rate}</span>
+            <span class="text-[10px] text-slate-400">ck/phút</span>
+          </div>
+          <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+            <span class="text-slate-400 block text-[10px] uppercase font-semibold">Nhịp cơ bản</span>
+            <span class="text-xs font-bold text-slate-800 dark:text-white truncate block mt-1">${data.rhythm}</span>
+          </div>
+          <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+            <span class="text-slate-400 block text-[10px] uppercase font-semibold">Trục QRS</span>
+            <span class="text-xs font-bold text-slate-800 dark:text-white truncate block mt-1">${data.axis}</span>
+          </div>
+          <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+            <span class="text-slate-400 block text-[10px] uppercase font-semibold">Khoảng QTc (Bazett)</span>
+            <span class="text-lg font-extrabold text-slate-800 dark:text-white font-mono-calc">${data.intervals.qtc}</span>
+          </div>
+        </div>
+
+        <div class="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl space-y-1.5 text-xs">
+          <span class="font-bold text-slate-700 dark:text-slate-300 block">Đo đạc chi tiết các sóng & đoạn:</span>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-[11px]">
+            <div><span class="text-slate-400">Đoạn PR:</span> <b class="font-mono-calc">${data.intervals.pr}</b></div>
+            <div><span class="text-slate-400">Phức bộ QRS:</span> <b class="font-mono-calc">${data.intervals.qrs}</b></div>
+            <div><span class="text-slate-400">Khoảng QT:</span> <b class="font-mono-calc">${data.intervals.qt}</b></div>
+          </div>
+        </div>
+
+        <div class="space-y-1.5">
+          <h5 class="text-xs font-bold uppercase tracking-wider text-slate-500">Các dấu hiệu bất thường phát hiện được:</h5>
+          <ul class="space-y-1 text-xs text-slate-700 dark:text-slate-300">
+            ${data.findings.map(f => `
+              <li class="flex items-start gap-2">
+                <i data-lucide="alert-circle" class="w-3.5 h-3.5 text-red-500 shrink-0 mt-0.5"></i>
+                <span>${f}</span>
+              </li>
+            `).join('')}
+          </ul>
+        </div>
+
+        <div class="p-3.5 rounded-xl bg-teal-50/70 dark:bg-teal-950/40 border border-teal-200 dark:border-teal-800/60 space-y-2">
+          <h5 class="text-xs font-bold text-teal-900 dark:text-teal-200 flex items-center gap-1.5">
+            <i data-lucide="check-square" class="w-4 h-4 text-teal-600"></i>
+            Gợi ý Xử trí & Hội chẩn lâm sàng:
+          </h5>
+          <ul class="space-y-1 text-xs text-teal-950 dark:text-teal-100 list-disc list-inside">
+            ${data.recommendations.map(r => `<li>${r}</li>`).join('')}
+          </ul>
+        </div>
+      `;
+      lucide.createIcons();
+    }
+
+    function copyAiReport() {
+      if (!currentAiCase) return;
+      const text = `=== BÁO CÁO PHÂN TÍCH ĐIỆN TÂM ĐỒ (AI ECG ASSISTANT) ===\nCa bệnh: ${currentAiCase.name}\nChẩn đoán gợi ý: ${currentAiCase.diagnosis}\nTần số: ${currentAiCase.rate} ck/p | Nhịp: ${currentAiCase.rhythm} | Trục: ${currentAiCase.axis}\nKhoảng: PR ${currentAiCase.intervals.pr} | QRS ${currentAiCase.intervals.qrs} | QTc ${currentAiCase.intervals.qtc}\n\nDấu hiệu phát hiện:\n${currentAiCase.findings.map(f => '- ' + f).join('\n')}\n\nGợi ý xử trí:\n${currentAiCase.recommendations.map(r => '- ' + r).join('\n')}\n\n*Lưu ý: Kết quả mang tính chất tham khảo cho Bác sĩ điều trị.`;
+      navigator.clipboard.writeText(text);
+      showToast('Đã copy toàn bộ kết quả phân tích ECG!', 'success');
+    }
+
+    function toggleApiConfig() {
+      const body = document.getElementById('api-config-body');
+      const chev = document.getElementById('api-chevron');
+      body.classList.toggle('hidden');
+      chev.classList.toggle('rotate-180');
+    }
+
+    function saveApiKey() {
+      const key = document.getElementById('gemini-api-key').value;
+      if (key) {
+        localStorage.setItem('clinical_desk_gemini_key', key);
+        showToast('Đã lưu Gemini API Key!', 'success');
+      }
+    }
+
+    // -------------------------------------------------------------
+    // TAB 3: PROTOCOLS
+    // -------------------------------------------------------------
+    const DEFAULT_PROTOCOLS = [
+      {
+        id: 'proto_1',
+        title: 'Quy trình Phẫu thuật Cắt ruột thừa nội soi',
+        category: 'Ngoại tiêu hóa',
+        indication: 'Viêm ruột thừa cấp, viêm phúc mạc ruột thừa.',
+        steps: [
+          'Tư thế bệnh nhân: Nằm ngửa, tay dạng, nghiêng trái Trendelenburg sau khi vào bụng.',
+          'Vô cảm: Mê nội khí quản.',
+          'Đặt 3 Trocar: Trocar 10mm rốn (Camera), Trocar 5mm hố chậu trái, Trocar 5/10mm hạ vị.',
+          'Thám sát ổ bụng: Xác định vị trí ruột thừa, kiểm tra dịch ổ bụng, loại trừ túi thừa Meckel.',
+          'Giải phóng mạc treo ruột thừa: Dùng dao siêu âm hoặc móc điện/bipolar đốt sát gốc.',
+          'Cột gốc ruột thừa: Dùng 2 nơ Roeder hoặc Endo-loop (chỉ Vicryl 1/0 hoặc Hem-o-lok), cắt cách nơ buộc 2-3mm.',
+          'Lấy bệnh phẩm: Cho vào bao cao su hoặc túi nilon chuyên dụng kéo qua lỗ Trocar rốn.',
+          'Lau rửa ổ bụng và dẫn lưu: Nếu viêm mủ/phúc mạc, rửa bằng NaCl 0.9% ấm, đặt dẫn lưu Douglas nếu cần.'
+        ],
+        complications: 'Chảy máu mạc treo, bục mỏm cụt, áp xe tồn lưu hố chậu phải/Douglas.',
+        postOp: 'Kháng sinh dự phòng/điều trị, cho ăn sớm sau 12-24h khi có trung tiện, rút dẫn lưu sau 48h nếu dịch trong.'
+      },
+      {
+        id: 'proto_2',
+        title: 'Checklist An toàn Phẫu thuật (WHO Surgical Safety)',
+        category: 'An toàn phẫu thuật',
+        indication: 'Bắt buộc thực hiện cho 100% ca phẫu thuật tại phòng mổ.',
+        steps: [
+          'Giai đoạn 1 (Sign In - Trước khi gây mê): Xác nhận danh tính người bệnh, vị trí phẫu thuật (đã đánh dấu), đồng thuận mổ, kiểm tra máy mê, dị ứng, nguy cơ đường thở khó, nguy cơ mất máu.',
+          'Giai đoạn 2 (Time Out - Trước khi rạch da): Toàn bộ kíp phẫu thuật tạm dừng, giới thiệu tên và vai trò; Đọc to tên BN, vị trí và loại phẫu thuật; Bác sĩ gây mê và phẫu thuật viên nêu các nguy cơ dự kiến; Đã tiêm kháng sinh dự phòng trong vòng 60 phút trước rạch da chưa; Đã hiển thị hình ảnh chẩn đoán cần thiết chưa.',
+          'Giai đoạn 3 (Sign Out - Trước khi rời phòng mổ): ĐD dụng cụ đếm đủ gạc và dụng cụ; Ghi nhãn đúng mẫu bệnh phẩm; Xác định các lưu ý chăm sóc và hồi tỉnh.'
+        ],
+        complications: 'Quên gạc, phẫu thuật nhầm bên/nhầm vị trí, sốc phản vệ không được dự phòng.',
+        postOp: 'Lưu bảng kiểm an toàn vào bệnh án.'
+      },
+      {
+        id: 'proto_3',
+        title: 'Quy trình Cắt túi mật nội soi (Laparoscopic Cholecystectomy)',
+        category: 'Ngoại tiêu hóa',
+        indication: 'Sỏi túi mật có triệu chứng, viêm túi mật cấp, polyp túi mật > 10mm.',
+        steps: [
+          'Vị trí Trocar: Kỹ thuật 4 Trocar (10mm rốn, 10mm dưới mũi ức, 5mm bờ sườn phải, 5mm đường nách trước).',
+          'Bộc lộ tam giác Calot: Kéo đáy túi mật lên trên ra ngoài, kéo phễu túi mật xuống dưới ra ngoài.',
+          'Đạt mốc Critical View of Safety (CVS): Bộc lộ rõ động mạch túi mật và ống túi mật, làm sạch 1/3 dưới đáy túi mật khỏi giường gan trước khi kẹp.',
+          'Kẹp Clip: 2 clip gốc ống túi mật, 1 clip ngọn; tương tự kẹp động mạch túi mật.',
+          'Bóc tách túi mật khỏi giường gan bằng móc điện, kiểm tra cầm máu giường gan cẩn thận.'
+        ],
+        complications: 'Tổn thương đường mật chính (ống mật chủ), chảy máu giường gan, rò mật.',
+        postOp: 'Theo dõi dịch dẫn lưu (nếu có), xuất viện sau 24-48 giờ nếu ổn định.'
+      },
+      {
+        id: 'proto_4',
+        title: 'Quy trình Mở khí quản cấp cứu (Tracheostomy)',
+        category: 'Cấp cứu - Hồi sức',
+        indication: 'Tắc nghẽn đường thở trên cấp tính, đặt NKQ thất bại, thở máy kéo dài > 14 ngày.',
+        steps: [
+          'Tư thế: Nằm ngửa, kê gối dưới vai để ngửa cổ tối đa.',
+          'Xác định mốc giải phẫu: Sụn nhẫn, hõm ức, khí quản.',
+          'Gây tê tại chỗ Lidocain 2% có Adrenalin.',
+          'Đường rạch: Đường dọc giữa cổ từ bờ dưới sụn nhẫn đến trên hõm ức 1.5cm.',
+          'Tách các lớp cơ dưới móng, bộc lộ eo tuyến giáp (vén lên hoặc cắt kẹp khâu nếu to).',
+          'Rạch mở khí quản ở vòng sụn 2-3 dạng chữ T hoặc cửa sổ.',
+          'Rút nhẹ ống NKQ và luồn Canule mở khí quản có nòng, bơm bóng chèn cuff, cố định dây buộc.'
+        ],
+        complications: 'Chảy máu tuyến giáp, tràn khí dưới da, tụt canule, tổn thương thành sau khí quản.',
+        postOp: 'Hút đờm dãi định kỳ vô khuẩn, duy trì áp lực bóng chèn 20-30 cmH2O.'
+      }
+    ];
+
+    let protocols = [];
+
+    function loadProtocols() {
+      const stored = localStorage.getItem('clinical_desk_protocols_v1');
+      protocols = stored ? JSON.parse(stored) : DEFAULT_PROTOCOLS;
+      renderProtocols('all');
+    }
+
+    function filterProtocols(cat) {
+      document.querySelectorAll('.proto-pill').forEach(p => {
+        p.classList.remove('active', 'bg-teal-600', 'text-white');
+        p.classList.add('bg-slate-100', 'dark:bg-slate-800', 'text-slate-600', 'dark:text-slate-300');
+        if (p.dataset.cat === cat) {
+          p.classList.add('active', 'bg-teal-600', 'text-white');
+          p.classList.remove('bg-slate-100', 'dark:bg-slate-800', 'text-slate-600', 'dark:text-slate-300');
+        }
+      });
+      renderProtocols(cat);
+    }
+
+    function renderProtocols(cat) {
+      const container = document.getElementById('protocol-list');
+      const filtered = cat === 'all' ? protocols : protocols.filter(p => p.category === cat);
+
+      container.innerHTML = filtered.map(item => `
+        <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col justify-between space-y-3">
+          <div>
+            <div class="flex items-center justify-between gap-2 mb-1.5">
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-100 dark:bg-teal-900/50 text-teal-800 dark:text-teal-300">${item.category}</span>
+              <button onclick="copyProtocolText('${item.id}')" class="text-xs text-slate-400 hover:text-teal-600 flex items-center gap-1">
+                <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy quy trình
+              </button>
+            </div>
+            <h3 class="font-bold text-sm sm:text-base text-slate-900 dark:text-white leading-snug">${item.title}</h3>
+            
+            <div class="mt-2.5 text-xs text-slate-600 dark:text-slate-300 space-y-1.5">
+              <div><b class="text-slate-900 dark:text-slate-100">Chỉ định:</b> ${item.indication}</div>
+              
+              <div class="mt-2">
+                <b class="text-slate-900 dark:text-slate-100 block mb-1">Các bước chính:</b>
+                <ol class="list-decimal list-inside space-y-1 pl-1 text-slate-600 dark:text-slate-300 leading-relaxed">
+                  ${item.steps.map(s => `<li>${s}</li>`).join('')}
+                </ol>
+              </div>
+
+              ${item.complications ? `<div class="mt-2 text-amber-700 dark:text-amber-300 text-[11px] bg-amber-50 dark:bg-amber-950/30 p-2 rounded-lg"><b>Tai biến & Lưu ý:</b> ${item.complications}</div>` : ''}
+            </div>
+          </div>
+
+          <div class="pt-2 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center text-xs text-slate-400">
+            <span>Hậu phẫu: ${item.postOp || 'Theo dõi thường quy'}</span>
+          </div>
+        </div>
+      `).join('');
+
+      lucide.createIcons();
+    }
+
+    function copyProtocolText(protoId) {
+      const p = protocols.find(x => x.id === protoId);
+      if (!p) return;
+      const text = `=== ${p.title.toUpperCase()} ===\nChuyên khoa: ${p.category}\nChỉ định: ${p.indication}\n\nCÁC BƯỚC TIẾN HÀNH:\n${p.steps.map((s, i) => `${i + 1}. ${s}`).join('\n')}\n\nTai biến cần lưu ý: ${p.complications}\nChăm sóc hậu phẫu: ${p.postOp}`;
+      navigator.clipboard.writeText(text);
+      showToast('Đã copy quy trình vào bộ nhớ tạm!', 'success');
+    }
+
+    function openNewProtocolModal() {
+      const title = prompt('Nhập tên phẫu thuật / thủ thuật:');
+      if (!title) return;
+      const cat = prompt('Chuyên khoa (Ngoại tiêu hóa, Chấn thương, Cấp cứu...):', 'Ngoại tiêu hóa') || 'Chung';
+      const stepsRaw = prompt('Nhập các bước chính (phân cách bằng dấu chấm phẩy ;):', 'Bước 1: Chuẩn bị; Bước 2: Rạch da; Bước 3: Đóng bụng');
+      
+      const newP = {
+        id: 'proto_' + Date.now(),
+        title: title,
+        category: cat,
+        indication: 'Theo chỉ định lâm sàng',
+        steps: stepsRaw.split(';').map(s => s.trim()).filter(Boolean),
+        complications: 'Chảy máu, nhiễm trùng',
+        postOp: 'Theo dõi sinh hiệu'
+      };
+      protocols.unshift(newP);
+      localStorage.setItem('clinical_desk_protocols_v1', JSON.stringify(protocols));
+      renderProtocols('all');
+      showToast('Đã thêm protocol mới thành công!', 'success');
+    }
+
+    // -------------------------------------------------------------
+    // TAB 4: SỬ DỤNG THUỐC & BỘ TÍNH eGFR / CrCl (CORE REQUIREMENT)
+    // -------------------------------------------------------------
+    let currentGender = 'male';
+    let creatinineUnit = 'umol';
+
+    function setEgfrGender(g) {
+      currentGender = g;
+      const btnM = document.getElementById('egfr-gender-male');
+      const btnF = document.getElementById('egfr-gender-female');
+      
+      if (g === 'male') {
+        btnM.className = 'py-2 px-3 rounded-xl border border-teal-600 bg-teal-50 dark:bg-teal-950/40 text-teal-700 dark:text-teal-300 font-bold flex items-center justify-center gap-1.5 transition';
+        btnF.className = 'py-2 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-medium flex items-center justify-center gap-1.5 transition';
+      } else {
+        btnF.className = 'py-2 px-3 rounded-xl border border-teal-600 bg-teal-50 dark:bg-teal-950/40 text-teal-700 dark:text-teal-300 font-bold flex items-center justify-center gap-1.5 transition';
+        btnM.className = 'py-2 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-medium flex items-center justify-center gap-1.5 transition';
+      }
+      calculateEgfr();
+    }
+
+    function setCreatinineUnit(unit) {
+      const crInput = document.getElementById('egfr-creatinine');
+      const curVal = parseFloat(crInput.value) || 0;
+      const unitDisplay = document.getElementById('current-unit-display');
+      const btnUmol = document.getElementById('unit-umol');
+      const btnMgdl = document.getElementById('unit-mgdl');
+
+      if (unit === creatinineUnit) return;
+
+      if (unit === 'mgdl') {
+        const converted = (curVal / 88.4).toFixed(2);
+        crInput.value = converted;
+        unitDisplay.innerText = 'mg/dL';
+        btnMgdl.className = 'px-2 py-0.5 rounded text-[11px] font-bold bg-white dark:bg-slate-700 text-teal-700 dark:text-teal-300 shadow-xs';
+        btnUmol.className = 'px-2 py-0.5 rounded text-[11px] font-medium text-slate-500';
+      } else {
+        const converted = Math.round(curVal * 88.4);
+        crInput.value = converted;
+        unitDisplay.innerText = 'µmol/L';
+        btnUmol.className = 'px-2 py-0.5 rounded text-[11px] font-bold bg-white dark:bg-slate-700 text-teal-700 dark:text-teal-300 shadow-xs';
+        btnMgdl.className = 'px-2 py-0.5 rounded text-[11px] font-medium text-slate-500';
+      }
+
+      creatinineUnit = unit;
+      calculateEgfr();
+    }
+
+    function resetEgfrInputs() {
+      document.getElementById('egfr-age').value = 65;
+      document.getElementById('egfr-weight').value = 60;
+      document.getElementById('egfr-height').value = 165;
+      if (creatinineUnit === 'umol') {
+        document.getElementById('egfr-creatinine').value = 130;
+      } else {
+        document.getElementById('egfr-creatinine').value = 1.47;
+      }
+      setEgfrGender('male');
+    }
+
+    function loadEgfrPreset(type) {
+      if (type === 'normal') {
+        document.getElementById('egfr-age').value = 45;
+        document.getElementById('egfr-weight').value = 65;
+        document.getElementById('egfr-creatinine').value = creatinineUnit === 'umol' ? 80 : 0.9;
+        setEgfrGender('male');
+      } else if (type === 'moderate') {
+        document.getElementById('egfr-age').value = 68;
+        document.getElementById('egfr-weight').value = 58;
+        document.getElementById('egfr-creatinine').value = creatinineUnit === 'umol' ? 140 : 1.58;
+        setEgfrGender('female');
+      } else if (type === 'severe') {
+        document.getElementById('egfr-age').value = 75;
+        document.getElementById('egfr-weight').value = 52;
+        document.getElementById('egfr-creatinine').value = creatinineUnit === 'umol' ? 320 : 3.62;
+        setEgfrGender('male');
+      }
+      calculateEgfr();
+    }
+
+    function calculateEgfr() {
+      const age = parseFloat(document.getElementById('egfr-age').value) || 18;
+      const weight = parseFloat(document.getElementById('egfr-weight').value) || 40;
+      const height = parseFloat(document.getElementById('egfr-height').value) || 165;
+      const rawCr = parseFloat(document.getElementById('egfr-creatinine').value) || 1;
+
+      const heightM = height / 100;
+      const bmi = (weight / (heightM * heightM)).toFixed(1);
+      document.getElementById('bmi-display').innerText = bmi;
+
+      let scrMgDl = 0;
+      let scrUmol = 0;
+      if (creatinineUnit === 'umol') {
+        scrUmol = rawCr;
+        scrMgDl = rawCr / 88.4;
+        document.getElementById('creatinine-converted-text').innerText = `${rawCr} µmol/L = ${(rawCr / 88.4).toFixed(2)} mg/dL`;
+      } else {
+        scrMgDl = rawCr;
+        scrUmol = Math.round(rawCr * 88.4);
+        document.getElementById('creatinine-converted-text').innerText = `${rawCr} mg/dL = ${Math.round(rawCr * 88.4)} µmol/L`;
+      }
+
+      // Cockcroft-Gault CrCl
+      let crcl = ((140 - age) * weight) / (72 * scrMgDl);
+      if (currentGender === 'female') {
+        crcl = crcl * 0.85;
+      }
+      crcl = Math.max(1, crcl);
+
+      // CKD-EPI 2021 eGFR
+      const isFemale = currentGender === 'female';
+      const kappa = isFemale ? 0.7 : 0.9;
+      const alpha = isFemale ? -0.241 : -0.302;
+      const ratio = scrMgDl / kappa;
+      const minRatio = Math.min(ratio, 1);
+      const maxRatio = Math.max(ratio, 1);
+      
+      let ckdepi = 142 * Math.pow(minRatio, alpha) * Math.pow(maxRatio, -1.200) * Math.pow(0.9938, age);
+      if (isFemale) {
+        ckdepi = ckdepi * 1.012;
+      }
+      ckdepi = Math.max(1, ckdepi);
+
+      document.getElementById('crcl-result-value').innerText = crcl.toFixed(1);
+      document.getElementById('ckdepi-result-value').innerText = ckdepi.toFixed(1);
+
+      updateKdigoStaging(ckdepi, crcl);
+      updateDrugDoseAdjustments(crcl);
+    }
+
+    function updateKdigoStaging(ckdepi, crcl) {
+      const card = document.getElementById('kdigo-stage-card');
+      const title = document.getElementById('kdigo-stage-title');
+      const badge = document.getElementById('kdigo-badge');
+      const advice = document.getElementById('kdigo-clinical-advice');
+
+      let stage = 'G1';
+      let stageText = '';
+      let badgeColor = '';
+      let cardBorder = '';
+      let adviceText = '';
+
+      if (ckdepi >= 90) {
+        stage = 'G1';
+        stageText = 'Giai đoạn G1: Chức năng thận bình thường hoặc tăng (≥ 90 mL/p)';
+        badgeColor = 'bg-emerald-200 dark:bg-emerald-900 text-emerald-900 dark:text-emerald-100';
+        cardBorder = 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-300 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200';
+        adviceText = 'Chức năng bài tiết tốt. Dùng liều thuốc theo khuyến cáo tiêu chuẩn thông thường.';
+      } else if (ckdepi >= 60) {
+        stage = 'G2';
+        stageText = 'Giai đoạn G2: Giảm mức lọc cầu thận nhẹ (60 - 89 mL/p)';
+        badgeColor = 'bg-blue-200 dark:bg-blue-900 text-blue-900 dark:text-blue-100';
+        cardBorder = 'bg-blue-50 dark:bg-blue-950/30 border-blue-300 dark:border-blue-800 text-blue-900 dark:text-blue-200';
+        adviceText = 'Đa số các thuốc không cần chỉnh liều, chú ý theo dõi nếu dùng thuốc độc thận dài ngày.';
+      } else if (ckdepi >= 45) {
+        stage = 'G3a';
+        stageText = 'Giai đoạn G3a: Giảm mức lọc cầu thận nhẹ đến vừa (45 - 59 mL/p)';
+        badgeColor = 'bg-amber-200 dark:bg-amber-900 text-amber-900 dark:text-amber-100';
+        cardBorder = 'bg-amber-50 dark:bg-amber-950/30 border-amber-300 dark:border-amber-800 text-amber-900 dark:text-amber-200';
+        adviceText = 'Bắt đầu cần giảm liều một số kháng sinh (Vancomycin, Cefepime, Levofloxacin). Cần hiệu chỉnh liều thuốc kháng đông DOAC.';
+      } else if (ckdepi >= 30) {
+        stage = 'G3b';
+        stageText = 'Giai đoạn G3b: Giảm mức lọc cầu thận vừa đến nặng (30 - 44 mL/p)';
+        badgeColor = 'bg-orange-200 dark:bg-orange-900 text-orange-900 dark:text-orange-100';
+        cardBorder = 'bg-orange-50 dark:bg-orange-950/30 border-orange-300 dark:border-orange-800 text-orange-900 dark:text-orange-200';
+        adviceText = 'Nguy cơ tích lũy độc tính cao. Bắt buộc giảm 30-50% liều hoặc giãn khoảng cách đưa liều. Chống chỉ định Metformin nếu eGFR < 30.';
+      } else if (ckdepi >= 15) {
+        stage = 'G4';
+        stageText = 'Giai đoạn G4: Suy thận nặng (15 - 29 mL/p)';
+        badgeColor = 'bg-red-200 dark:bg-red-900 text-red-900 dark:text-red-100';
+        cardBorder = 'bg-red-50 dark:bg-red-950/30 border-red-400 dark:border-red-800 text-red-900 dark:text-red-200';
+        adviceText = 'BÁO ĐỘNG SUY THẬN NẶNG. Giảm mạnh liều hoặc chống chỉ định Enoxaparin liều điều trị, DOACs, NSAIDs, Metformin.';
+      } else {
+        stage = 'G5';
+        stageText = 'Giai đoạn G5: Suy thận giai đoạn cuối / Cần lọc máu (< 15 mL/p)';
+        badgeColor = 'bg-purple-200 dark:bg-purple-900 text-purple-900 dark:text-purple-100';
+        cardBorder = 'bg-purple-50 dark:bg-purple-950/30 border-purple-400 dark:border-purple-800 text-purple-900 dark:text-purple-200';
+        adviceText = 'Bệnh thận giai đoạn cuối. Cần lọc máu chu kỳ hoặc chỉ định dùng liều sau khi lọc máu (Post-HD dosing).';
+      }
+
+      badge.innerText = stage;
+      badge.className = `text-xs px-2 py-0.5 rounded-full font-bold ${badgeColor}`;
+      title.innerText = stageText;
+      advice.innerText = adviceText;
+      card.className = `p-4 rounded-2xl border transition-all duration-300 ${cardBorder}`;
+    }
+
+    function updateDrugDoseAdjustments(crcl) {
+      const tbody = document.getElementById('drug-adjustment-tbody');
+      
+      const drugs = [
+        {
+          group: 'Kháng sinh',
+          name: 'Vancomycin (TM)',
+          rule: crcl >= 50 ? '15-20 mg/kg mỗi 8-12 giờ. Đích Trough 15-20 mcg/mL.' :
+                crcl >= 20 ? '15 mg/kg mỗi 24 giờ. Bắt buộc định lượng nồng độ đáy (Trough).' :
+                             '15 mg/kg mỗi 48-72 giờ hoặc dùng liều duy nhất và xét nghiệm nồng độ.',
+          severity: crcl < 50 ? 'Cảnh báo: Độc thận' : 'Liều thường quy'
+        },
+        {
+          group: 'Kháng sinh',
+          name: 'Meropenem (TM)',
+          rule: crcl >= 50 ? '1g mỗi 8 giờ truyền tĩnh mạch.' :
+                crcl >= 26 ? '1g mỗi 12 giờ.' :
+                crcl >= 10 ? '500mg mỗi 12 giờ.' :
+                             '500mg mỗi 24 giờ (sau lọc máu).',
+          severity: crcl < 50 ? 'Cần chỉnh liều' : 'Liều thường quy'
+        },
+        {
+          group: 'Kháng đông',
+          name: 'Enoxaparin (Lovenox)',
+          rule: crcl >= 30 ? 'Dự phòng: 40mg TDD/24h. Điều trị: 1mg/kg TDD mỗi 12h.' :
+                             'CHỐNG CHỈ ĐỊNH liều 1mg/kg x 2 lần. Phải giảm xuống 1mg/kg TDD MỖI 24 GIỜ (hoặc chuyển Heparin không phân đoạn).',
+          severity: crcl < 30 ? 'NGUY HIỂM: Xuất huyết' : 'Liều chuẩn'
+        },
+        {
+          group: 'Kháng sinh',
+          name: 'Levofloxacin (Uống/TM)',
+          rule: crcl >= 50 ? '500mg - 750mg mỗi 24 giờ.' :
+                crcl >= 20 ? 'Liều đầu 500mg, sau đó 250mg mỗi 24 giờ.' :
+                             'Liều đầu 500mg, sau đó 250mg mỗi 48 giờ.',
+          severity: crcl < 50 ? 'Cần chỉnh liều' : 'Liều chuẩn'
+        },
+        {
+          group: 'Đái tháo đường',
+          name: 'Metformin',
+          rule: crcl >= 45 ? 'Tối đa 2000mg/ngày. An toàn.' :
+                crcl >= 30 ? 'Tối đa 1000mg/ngày. Thận trọng nguy cơ nhiễm toan Lactic.' :
+                             'CHỐNG CHỈ ĐỊNH TUYỆT ĐỐI khi CrCl/eGFR < 30 mL/phút.',
+          severity: crcl < 30 ? 'CHỐNG CHỈ ĐỊNH' : (crcl < 45 ? 'Giảm liều' : 'An toàn')
+        },
+        {
+          group: 'Kháng đông DOAC',
+          name: 'Rivaroxaban (Xarelto)',
+          rule: crcl >= 50 ? '20mg x 1 lần/ngày cùng bữa ăn.' :
+                crcl >= 15 ? 'Giảm xuống 15mg x 1 lần/ngày.' :
+                             'Chống chỉ định khi CrCl < 15 mL/phút.',
+          severity: crcl < 50 ? 'Chỉnh liều 15mg' : 'Liều chuẩn 20mg'
+        }
+      ];
+
+      tbody.innerHTML = drugs.map(d => {
+        let badgeColor = 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300';
+        if (d.severity.includes('CHỐNG CHỈ ĐỊNH') || d.severity.includes('NGUY HIỂM')) {
+          badgeColor = 'bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300 font-bold';
+        } else if (d.severity.includes('Cảnh báo') || d.severity.includes('Giảm') || d.severity.includes('Chỉnh')) {
+          badgeColor = 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 font-semibold';
+        } else {
+          badgeColor = 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300';
+        }
+
+        return `
+          <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/40 transition">
+            <td class="py-2.5 font-medium text-slate-500">${d.group}</td>
+            <td class="py-2.5 font-bold text-slate-900 dark:text-white">${d.name}</td>
+            <td class="py-2.5 text-slate-700 dark:text-slate-300 leading-relaxed pr-2">${d.rule}</td>
+            <td class="py-2.5 text-right whitespace-nowrap">
+              <span class="px-2 py-0.5 rounded text-[10px] ${badgeColor}">${d.severity}</span>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function switchDrugSubTab(sub) {
+      const egfrView = document.getElementById('drug-egfr-calculator-view');
+      const listView = document.getElementById('drug-list-view');
+      const btnEgfr = document.getElementById('subtab-btn-egfr');
+      const btnList = document.getElementById('subtab-btn-list');
+
+      if (sub === 'egfr') {
+        egfrView.classList.remove('hidden');
+        listView.classList.add('hidden');
+        btnEgfr.className = 'px-3 py-1.5 rounded-lg bg-white dark:bg-slate-700 text-teal-700 dark:text-teal-300 shadow-xs';
+        btnList.className = 'px-3 py-1.5 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900';
+      } else {
+        egfrView.classList.add('hidden');
+        listView.classList.remove('hidden');
+        btnList.className = 'px-3 py-1.5 rounded-lg bg-white dark:bg-slate-700 text-teal-700 dark:text-teal-300 shadow-xs';
+        btnEgfr.className = 'px-3 py-1.5 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900';
+        renderDrugCards();
+      }
+    }
+
+    const EMERGENCY_DRUGS = [
+      {
+        name: 'Adrenalin (Epinephrine) 1mg/1mL',
+        indication: 'Ngừng tuần hoàn, Phản vệ nguy kịch',
+        prep: 'Phản vệ: 1/2 ống (0.5mg) tiêm bắp đùi trước ngoài ngay lập tức. Ngừng tim: 1mg TM mỗi 3-5 phút.',
+        warning: 'Không chậm trễ tiêm bắp trong phản vệ độ II trở lên.'
+      },
+      {
+        name: 'Noradrenalin (Norepinephrine) 4mg/4mL',
+        indication: 'Sốc nhiễm khuẩn, Sốc tim có giãn mạch',
+        prep: 'Pha 2 ống (8mg) với NaCl 0.9% hoặc G5% vừa đủ 50mL qua bơm tiêm điện. Khởi đầu: 0.05 - 0.1 mcg/kg/phút, chỉnh theo MAP >= 65 mmHg.',
+        warning: 'Ưu tiên truyền qua catheter tĩnh mạch trung tâm đề phòng hoại tử do thoát mạch.'
+      },
+      {
+        name: 'Amiodarone (Cordarone) 150mg/3mL',
+        indication: 'Rung thất trơ, Tim nhanh thất, Rung nhĩ nhanh',
+        prep: 'Ngừng tim (VF/VT vô mạch): 300mg bolus TM sau sốc điện lần 3. Chống loạn nhịp: 150mg pha trong 100mL G5% truyền trong 10-20 phút.',
+        warning: 'Chỉ pha trong đường Dextrose 5% (không pha NaCl vì kết tủa). Nguy cơ tụt HA và chậm nhịp tim.'
+      },
+      {
+        name: 'Furosemid (Lasix) 20mg/2mL',
+        indication: 'Phù phổi cấp, Suy tim ứ huyết, Suy thận ứ dịch',
+        prep: 'Cấp cứu phù phổi: 40 - 80mg tiêm TM chậm trong 2-3 phút.',
+        warning: 'Theo dõi ion đồ (Hạ Kali, Hạ Natri) và huyết áp.'
+      }
+    ];
+
+    function renderDrugCards(filter = '') {
+      const container = document.getElementById('drug-cards-container');
+      const filtered = EMERGENCY_DRUGS.filter(d => d.name.toLowerCase().includes(filter.toLowerCase()) || d.indication.toLowerCase().includes(filter.toLowerCase()));
+
+      container.innerHTML = filtered.map(d => `
+        <div class="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/40 space-y-2 text-xs">
+          <div class="font-bold text-slate-900 dark:text-white text-sm text-teal-700 dark:text-teal-300">${d.name}</div>
+          <div><b class="text-slate-600 dark:text-slate-400">Chỉ định:</b> ${d.indication}</div>
+          <div class="p-2 bg-white dark:bg-slate-900 rounded-lg border border-slate-100 dark:border-slate-800 font-mono-calc text-[11px] text-slate-800 dark:text-slate-200">
+            ${d.prep}
+          </div>
+          <div class="text-[11px] text-amber-700 dark:text-amber-300"><b>Lưu ý:</b> ${d.warning}</div>
+        </div>
+      `).join('');
+    }
+
+    function filterDrugList() {
+      const val = document.getElementById('drug-search-input').value;
+      renderDrugCards(val);
+    }
+
+    // -------------------------------------------------------------
+    // TAB 5: BÁO CÁO GIAO BAN
+    // -------------------------------------------------------------
+    function initBriefingTab() {
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('brief-date').value = today;
+      updateBriefingPreview();
+    }
+
+    function updateBriefingPreview() {
+      const date = document.getElementById('brief-date').value || 'Hôm nay';
+      const team = document.getElementById('brief-team').value;
+      const total = document.getElementById('brief-total').value || 0;
+      const adm = document.getElementById('brief-admissions').value || 0;
+      const dis = document.getElementById('brief-discharges').value || 0;
+      const emergSurg = document.getElementById('brief-emerg-surgeries').value || 0;
+      const schedSurg = document.getElementById('brief-sched-surgeries').value || 0;
+      const deaths = document.getElementById('brief-deaths').value || 0;
+      const heavy = document.getElementById('brief-heavy-patients').value;
+      const incidents = document.getElementById('brief-incidents').value;
+
+      const preview = `📋 BÁO CÁO GIAO BAN CA TRỰC KHOA
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+📅 Ngày trực: ${date}
+👨‍⚕️ Kíp trực: ${team}
+
+📊 SỐ LIỆU TỔNG HỢP:
+• Tổng số bệnh nhân hiện tại: ${total} BN
+• Tiếp nhận vào viện mới: ${adm} BN
+• Ra viện / Chuyển viện: ${dis} BN
+• Phẫu thuật cấp cứu trong trực: ${emergSurg} ca
+• Phẫu thuật phiên: ${schedSurg} ca
+• Ca tử vong / Tiên lượng nặng xin về: ${deaths} ca
+
+🚨 DANH SÁCH BỆNH NHÂN NẶNG / XIN Ý KIẾN:
+${heavy ? heavy : '(Không có ca nặng phát sinh ngoài dự kiến)'}
+
+⚙️ TÌNH HÌNH TRANG THIẾT BỊ / SỰ CỐ:
+${incidents ? incidents : 'Ca trực an toàn, trang thiết bị hoạt động ổn định.'}
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+(Báo cáo được xuất từ Clinical Desk MD)`;
+
+      document.getElementById('briefing-preview-text').innerText = preview;
+    }
+
+    function copyBriefingText() {
+      const text = document.getElementById('briefing-preview-text').innerText;
+      navigator.clipboard.writeText(text);
+      showToast('Đã copy toàn bộ nội dung báo cáo giao ban để dán vào Zalo/Viber!', 'success');
+    }
+
+    // -------------------------------------------------------------
+    // TAB 6: THANG ĐIỂM GLASGOW & CURB-65 & SCRATCHPAD
+    // -------------------------------------------------------------
+    function calcGcs() {
+      const e = parseInt(document.getElementById('gcs-eye').value);
+      const v = parseInt(document.getElementById('gcs-verbal').value);
+      const m = parseInt(document.getElementById('gcs-motor').value);
+      const total = e + v + m;
+      
+      document.getElementById('gcs-total').innerText = total + ' Điểm';
+      
+      let evalText = '';
+      let colorClass = '';
+      if (total >= 14) {
+        evalText = `Tri giác bình thường hoặc chấn thương sọ não nhẹ (${total} điểm)`;
+        colorClass = 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300';
+      } else if (total >= 9) {
+        evalText = `Chấn thương sọ não vừa - Theo dõi sát tri giác (${total} điểm)`;
+        colorClass = 'bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300';
+      } else {
+        evalText = `HÔN MÊ SÂU (GCS <= 8). Có chỉ định ĐẶT ỐNG NỘI KHÍ QUẢN bảo vệ đường thở! (${total} điểm)`;
+        colorClass = 'bg-red-50 dark:bg-red-950/40 text-red-800 dark:text-red-300 font-bold';
+      }
+      
+      const el = document.getElementById('gcs-eval');
+      el.className = `p-2 rounded-lg text-[11px] ${colorClass}`;
+      el.innerText = evalText;
+    }
+
+    function calcCurb() {
+      let score = 0;
+      if (document.getElementById('curb-c').checked) score++;
+      if (document.getElementById('curb-u').checked) score++;
+      if (document.getElementById('curb-r').checked) score++;
+      if (document.getElementById('curb-b').checked) score++;
+      if (document.getElementById('curb-65').checked) score++;
+
+      document.getElementById('curb-total').innerText = score + ' Điểm';
+      
+      let evalText = '';
+      let colorClass = '';
+      if (score <= 1) {
+        evalText = `Nguy cơ tử vong thấp (1.5%). Cân nhắc điều trị ngoại trú (${score} điểm)`;
+        colorClass = 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300';
+      } else if (score === 2) {
+        evalText = `Nguy cơ vừa (9.2%). Chỉ định NHẬP VIỆN điều trị nội trú (${score} điểm)`;
+        colorClass = 'bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 font-semibold';
+      } else {
+        evalText = `VIÊM PHỔI NẶNG (Nguy cơ tử vong 22-30%). Chỉ định NHẬP KHOA ICU / HỒI SỨC (${score} điểm)`;
+        colorClass = 'bg-red-50 dark:bg-red-950/40 text-red-800 dark:text-red-300 font-bold';
+      }
+
+      const el = document.getElementById('curb-eval');
+      el.className = `p-2 rounded-lg text-[11px] ${colorClass}`;
+      el.innerText = evalText;
+    }
+
+    // Scratchpad auto-save
+    const scratchpad = document.getElementById('doctor-scratchpad');
+    scratchpad.value = localStorage.getItem('clinical_desk_scratchpad') || '';
+    scratchpad.addEventListener('input', () => {
+      localStorage.setItem('clinical_desk_scratchpad', scratchpad.value);
+      const status = document.getElementById('scratchpad-status');
+      status.innerText = 'Đã lưu lúc ' + new Date().toLocaleTimeString('vi-VN');
+    });
+
+    function clearScratchpad() {
+      if (confirm('Bác sĩ có chắc muốn xóa sạch trang ghi chú này?')) {
+        scratchpad.value = '';
+        localStorage.removeItem('clinical_desk_scratchpad');
+        document.getElementById('scratchpad-status').innerText = 'Đã xóa trắng';
+      }
+    }
+
+    // -------------------------------------------------------------
+    // DEMO ECG LOADER HELPER
+    // -------------------------------------------------------------
+    function loadDemoECGs() {
+      const demoItems = [
+        {
+          id: 'ecg_demo_1',
+          patientName: 'BN Nguyễn Văn H (54t)',
+          diagnosis: 'NMCT Cấp ST Chênh Lên V1-V4',
+          notes: 'Điện tim lúc vào viện đau ngực dữ dội giờ thứ 3. Đã chuyển Can thiệp mạch vành.',
+          createdAt: Date.now() - (2 * 24 * 60 * 60 * 1000),
+          pinned: true,
+          caseKey: 'stemi'
+        },
+        {
+          id: 'ecg_demo_2',
+          patientName: 'BN Trần Thị T (68t)',
+          diagnosis: 'Rung Nhĩ Đáp Ứng Thất Nhanh',
+          notes: 'Tần số thất 140 ck/phút. Tiền sử THA 10 năm.',
+          createdAt: Date.now() - (27 * 24 * 60 * 60 * 1000),
+          pinned: false,
+          caseKey: 'afib'
+        },
+        {
+          id: 'ecg_demo_3',
+          patientName: 'BN Vũ Đình K (71t)',
+          diagnosis: 'Block Nhánh Trái Hoàn Toàn (LBBB)',
+          notes: 'Hẹp hở van động mạch chủ nặng, theo dõi suy tim LVEF 35%.',
+          createdAt: Date.now() - (10 * 24 * 60 * 60 * 1000),
+          pinned: false,
+          caseKey: 'lbbb'
+        }
+      ];
+
+      demoItems.forEach(item => {
+        const canvas = document.createElement('canvas');
+        canvas.width = 700;
+        canvas.height = 360;
+        const ctx = canvas.getContext('2d');
+        drawMockEcgCanvas(ctx, item.caseKey);
+        item.dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+        delete item.caseKey;
+        ecgList.unshift(item);
+      });
+
+      saveECGs();
+      renderECGGallery();
+      showToast('Đã nạp 3 ca ECG mẫu thành công (bao gồm 1 ca sắp hết hạn 30 ngày để thử nghiệm)', 'success');
+    }
+
+    // -------------------------------------------------------------
+    // INITIALIZATION ON LOAD
+    // -------------------------------------------------------------
+    window.addEventListener('DOMContentLoaded', () => {
+      initNavigation();
+      loadECGs();
+      loadProtocols();
+      calculateEgfr();
+      initBriefingTab();
+      calcGcs();
+      calcCurb();
+
+      const docName = document.getElementById('doctor-name-input');
+      const docDept = document.getElementById('doctor-dept-input');
+      docName.value = localStorage.getItem('clinical_desk_doc_name') || '';
+      docDept.value = localStorage.getItem('clinical_desk_doc_dept') || '';
+
+      docName.addEventListener('change', () => localStorage.setItem('clinical_desk_doc_name', docName.value));
+      docDept.addEventListener('change', () => localStorage.setItem('clinical_desk_doc_dept', docDept.value));
+
+      lucide.createIcons();
+    });
+  </script>
+</body>
+</html>
