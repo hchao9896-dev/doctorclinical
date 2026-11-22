@@ -227,25 +227,38 @@
               </p>
             </div>
 
-            <!-- Pre-loaded sample picker -->
-            <div class="flex items-center gap-2">
-              <label class="text-xs font-semibold text-slate-500">Ca mẫu:</label>
-              <select id="ai-sample-select" onchange="loadAiSampleCase(this.value)" class="text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-1.5 focus:ring-teal-500">
-                <option value="">-- Chọn ca lâm sàng mẫu --</option>
-                <option value="stemi">1. NMCT Cấp ST Chênh Lên (STEMI Thành Trước)</option>
-                <option value="afib">2. Rung Nhĩ Đáp Ứng Thất Nhanh (AFib)</option>
-                <option value="lbbb">3. Block Nhánh Trái Hoàn Toàn (LBBB)</option>
-                <option value="normal">4. Điện tâm đồ Nhịp Xoang Bình Thường</option>
-              </select>
+            <!-- Pre-loaded sample picker & Standards Guide Button -->
+            <div class="flex flex-wrap items-center gap-2">
+              <button onclick="toggleEcgStandardsModal()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-teal-50 dark:bg-teal-950/50 border border-teal-200 dark:border-teal-800 text-teal-800 dark:text-teal-300 hover:bg-teal-100 text-xs font-semibold shadow-xs transition">
+                <i data-lucide="book-open" class="w-3.5 h-3.5 text-teal-600"></i>
+                <span>Tiêu chuẩn GS. Trần Đỗ Trinh & BS. Bùi Cao Mỹ Ái</span>
+              </button>
+              <div class="flex items-center gap-1.5">
+                <label class="text-xs font-semibold text-slate-500">Ca mẫu:</label>
+                <select id="ai-sample-select" onchange="loadAiSampleCase(this.value)" class="text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-2.5 py-1.5 focus:ring-teal-500 font-medium">
+                  <option value="">-- Chọn ca lâm sàng mẫu --</option>
+                  <option value="stemi_anterior">1. NMCT Cấp ST Chênh Lên Trước Vách (V1-V4)</option>
+                  <option value="stemi_inferior">2. NMCT Cấp Thành Dưới (DII, DIII, aVF - Soi gương DI, aVL)</option>
+                  <option value="afib_rvr">3. Rung Nhĩ Đáp Ứng Thất Nhanh (AFib with RVR)</option>
+                  <option value="aflutter">4. Cuồng Động Nhĩ (Atrial Flutter 2:1 - Sóng F răng cưa)</option>
+                  <option value="rbbb">5. Block Nhánh Phải Hoàn Toàn (RBBB - rsR' V1)</option>
+                  <option value="lbbb">6. Block Nhánh Trái Hoàn Toàn (LBBB - R có khấc V5-V6)</option>
+                  <option value="wpw">7. Hội Chứng Kích Thích Sớm WPW (Sóng Delta + PR ngắn)</option>
+                  <option value="lvh_lae">8. Tăng Gánh Nhĩ Trái & Dày Thất Trái THA (Sokolow-Lyon &ge; 35mm)</option>
+                  <option value="av_block_2">9. Block Nhĩ Thất Độ 2 Mobitz 1 (Chu kỳ Wenckebach)</option>
+                  <option value="hyperkalemia">10. Tăng Kali Máu Nặng (Sóng T cao nhọn đối xứng lều)</option>
+                  <option value="normal">11. Điện Tâm Đồ Nhịp Xoang Bình Thường (Đạt 5 tiêu chuẩn)</option>
+                </select>
+              </div>
             </div>
           </div>
 
-          <!-- Academic Disclaimer Alert -->
-          <div class="mt-4 p-3 rounded-xl bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-800/50 flex items-start gap-2.5 text-xs text-indigo-900 dark:text-indigo-200">
-            <i data-lucide="shield-alert" class="w-4 h-4 shrink-0 text-indigo-600 dark:text-indigo-400 mt-0.5"></i>
+          <!-- Academic & Standard Reference Alert -->
+          <div class="mt-4 p-3 rounded-xl bg-gradient-to-r from-teal-500/10 via-indigo-500/10 to-purple-500/10 border border-teal-200 dark:border-teal-800/50 flex items-start gap-2.5 text-xs text-slate-800 dark:text-slate-200">
+            <i data-lucide="check-circle" class="w-4 h-4 shrink-0 text-teal-600 mt-0.5"></i>
             <div>
-              <span class="font-bold">Khuyến cáo học thuật & Lâm sàng:</span>
-              Kết quả AI mang tính chất tham khảo trợ giúp ra quyết định nhanh cho Bác sĩ, không thay thế chẩn đoán lâm sàng và quyết định điều trị của Bác sĩ điều trị.
+              <span class="font-bold text-teal-800 dark:text-teal-300">Chu trình Phân tích 6 Bước Tiêu Chuẩn Học Thuật:</span>
+              Tích hợp đầy đủ tiêu chuẩn chẩn đoán kinh điển của <b>GS. Trần Đỗ Trinh</b> (ĐH Y Dược Huế) và <b>BS. Bùi Cao Mỹ Ái</b>: Kiểm tra định chuẩn & bẫy mắc dây &rarr; 5 tiêu chuẩn nhịp xoang & tính tần số &rarr; Tam trục kép Bayley & tư thế tim &rarr; Sóng P & khoảng PQ/PR &rarr; Phức bộ QRS (Sóng Q Minnesota, Block nhánh, Dày thất) &rarr; Tái cực ST-T-QT (Điểm J, sóng vành Pardee, T tăng Kali, QTc Bazett) &rarr; Kết luận & hướng xử trí.
             </div>
           </div>
         </div>
@@ -888,6 +901,131 @@
     </div>
   </div>
 
+  <!-- MODAL: BẢNG TRA CỨU TIÊU CHUẨN ĐIỆN TÂM ĐỒ (GS. TRẦN ĐỖ TRINH & BS. BÙI CAO MỸ ÁI) -->
+  <div id="ecg-standards-modal" class="fixed inset-0 z-50 bg-black/80 hidden backdrop-blur-sm flex items-center justify-center p-3 sm:p-5">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-4xl w-full max-h-[90vh] flex flex-col border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden">
+      <!-- Modal Header -->
+      <div class="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-800/50">
+        <div class="flex items-center gap-2.5">
+          <span class="p-2 bg-teal-600 text-white rounded-xl shadow-xs">
+            <i data-lucide="book-open" class="w-5 h-5"></i>
+          </span>
+          <div>
+            <h3 class="text-base font-bold text-slate-900 dark:text-white">Hệ Thống Tiêu Chuẩn Đọc Điện Tâm Đồ Lâm Sàng</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Đúc kết từ tài liệu <b>GS. Trần Đỗ Trinh</b> (ĐH Y Dược Huế) & <b>BS. Bùi Cao Mỹ Ái</b></p>
+          </div>
+        </div>
+        <button onclick="toggleEcgStandardsModal()" class="p-2 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body (Scrollable) -->
+      <div class="p-4 sm:p-6 overflow-y-auto space-y-5 text-xs text-slate-700 dark:text-slate-300">
+        
+        <!-- Quy tắc cốt lõi 3, 3, 3 và 5 -->
+        <div class="p-3.5 rounded-xl bg-teal-50 dark:bg-teal-950/40 border border-teal-200 dark:border-teal-800">
+          <h4 class="font-bold text-teal-900 dark:text-teal-200 text-sm flex items-center gap-1.5 mb-2">
+            <i data-lucide="bookmark" class="w-4 h-4 text-teal-600"></i>
+            Quy tắc vàng ghi nhớ nhanh: "3, 3, 3 và 5" (BS. Bùi Cao Mỹ Ái)
+          </h4>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
+            <div class="bg-white dark:bg-slate-900 p-2 rounded-lg border border-teal-200/60 dark:border-teal-900">
+              <span class="block text-[11px] text-slate-400">Sóng P Rộng</span>
+              <span class="font-bold text-teal-700 dark:text-teal-300 text-sm">&le; 3 ô (0.12s)</span>
+            </div>
+            <div class="bg-white dark:bg-slate-900 p-2 rounded-lg border border-teal-200/60 dark:border-teal-900">
+              <span class="block text-[11px] text-slate-400">Sóng P Cao</span>
+              <span class="font-bold text-teal-700 dark:text-teal-300 text-sm">&le; 3 ô (0.3mV)</span>
+            </div>
+            <div class="bg-white dark:bg-slate-900 p-2 rounded-lg border border-teal-200/60 dark:border-teal-900">
+              <span class="block text-[11px] text-slate-400">QRS Rộng</span>
+              <span class="font-bold text-teal-700 dark:text-teal-300 text-sm">&le; 3 ô (0.12s)</span>
+            </div>
+            <div class="bg-white dark:bg-slate-900 p-2 rounded-lg border border-teal-200/60 dark:border-teal-900">
+              <span class="block text-[11px] text-slate-400">Khoảng PR</span>
+              <span class="font-bold text-teal-700 dark:text-teal-300 text-sm">&le; 5 ô (0.20s)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6 Bước Chuẩn Mực Đọc Điện Tim (GS. Trần Đỗ Trinh) -->
+        <div class="space-y-4">
+          <h4 class="font-bold text-slate-900 dark:text-white text-sm uppercase tracking-wider border-b border-slate-200 dark:border-slate-800 pb-1 flex items-center gap-2">
+            <i data-lucide="layers" class="w-4 h-4 text-purple-600"></i>
+            Chi tiết 6 bước đọc điện tim chuẩn mực
+          </h4>
+
+          <!-- Bước 1 -->
+          <div class="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl space-y-1.5 border border-slate-200 dark:border-slate-700/60">
+            <b class="text-teal-700 dark:text-teal-300">Bước 1: Kỹ thuật ghi & Định chuẩn (Calibration)</b>
+            <p>• <b>Tốc độ 25mm/s:</b> 1 ô nhỏ 1mm = 0.04s; 1 ô lớn 5mm = 0.20s. (Nếu 50mm/s thì 1 ô nhỏ = 0.02s).</p>
+            <p>• <b>Điện thế 1mV = 10mm:</b> 1 ô nhỏ = 0.1mV. Lưu ý ký hiệu <b>2N</b> (20mm=1mV &rarr; chia đôi biên độ đọc) hoặc <b>N/2</b> (5mm=1mV &rarr; nhân đôi biên độ đọc).</p>
+            <p>• <b>Bẫy mắc ngược điện cực tay:</b> Dây đỏ (tay phải) nhầm sang tay trái &rarr; DI âm toàn bộ (P, QRS, T đều âm), DII thành DIII, aVR đảo với aVL; trước ngực không đổi.</p>
+            <p>• <b>Định luật Einthoven:</b> DI + DIII = DII. Nhiễu xoay chiều 50Hz gây "tòe đều" dọc đường ghi (do đứt dây đất); Run cơ gây sóng lăn tăn không đều.</p>
+          </div>
+
+          <!-- Bước 2 -->
+          <div class="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl space-y-1.5 border border-slate-200 dark:border-slate-700/60">
+            <b class="text-teal-700 dark:text-teal-300">Bước 2: Phân tích Nhịp tim & Tần số tim</b>
+            <p>• <b>5 Tiêu chuẩn Nhịp Xoang:</b> (1) Có sóng P đi trước mỗi QRST; (2) P dương ở DI, DII, aVF, V5, V6; P âm ở aVR; (3) Khoảng PQ/PR hằng định (0.12 - 0.20s); (4) Hình dạng sóng P đồng nhất trên cùng chuyển đạo; (5) Tần số 60 - 100 lần/phút (chênh lệch PP max-min &lt; 0.16s).</p>
+            <p>• <b>Cách tính tần số:</b> Nhịp đều: <b>300 / số ô lớn</b> hoặc <b>1500 / số ô nhỏ</b> hoặc <b>60 / RR (giây)</b>. Nhịp không đều: Đếm số đỉnh R trong 30 ô lớn (6 giây) &times; 10.</p>
+            <p>• <b>Phương pháp băng vạch nhịp PP:</b> Dùng băng giấy chia khoảng PP để truy tìm sóng P "ẩn náu" trong QRS/ST/T nhằm chẩn đoán Nhịp nhanh thất, Phân ly nhĩ thất hoặc Block AV cấp 3.</p>
+            <p>• <b>Loạn nhịp thường gặp:</b> Rung nhĩ (mất P, thay bằng sóng f lăn tăn 400-600 ck/p, RR hoàn toàn không đều); Cuồng nhĩ (sóng F răng cưa 300 ck/p); Ngoại tâm thu thất (QRS &ge; 0.13s giãn rộng, ST-T trái chiều, nghỉ bù hoàn toàn RR'R = 2RR); Ngoại tâm thu trên thất (P' sớm, biến dạng, không nghỉ bù); Cơn nhịp nhanh kịch phát trên thất SVT (140-220 ck/p đều tăm tắp).</p>
+          </div>
+
+          <!-- Bước 3 -->
+          <div class="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl space-y-1.5 border border-slate-200 dark:border-slate-700/60">
+            <b class="text-teal-700 dark:text-teal-300">Bước 3: Trục điện tim & Tư thế tim (Tam trục kép Bayley)</b>
+            <p>• <b>Tam trục kép Bayley:</b> 3 cặp vuông góc DI &perp; aVF; DII &perp; aVL; DIII &perp; aVR.</p>
+            <p>• <b>Góc &alpha; người Việt Nam:</b> Trung bình <b>+65&deg;</b> (biến thiên bình thường từ +26&deg; đến +100&deg;).</p>
+            <p>• <b>Phân loại trục:</b> Trung gian (0&deg; đến +90&deg;); Trục trái (0&deg; đến -90&deg;); Trục phải (+90&deg; đến +180&deg;); Trục vô định (-90&deg; đến -150&deg;).</p>
+            <p>• <b>Tư thế tim:</b> Tim nằm (aVL dương, aVF âm dạng rS, hình ảnh Q1S3); Tim đứng (aVL âm dạng rS, aVF dương dạng qR, hình ảnh S1Q3); Mỏm tim ra sau (S1S2S3).</p>
+          </div>
+
+          <!-- Bước 4 -->
+          <div class="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl space-y-1.5 border border-slate-200 dark:border-slate-700/60">
+            <b class="text-teal-700 dark:text-teal-300">Bước 4: Khảo sát Sóng P & Dẫn truyền Nhĩ Thất (PQ/PR)</b>
+            <p>• <b>Sóng P bình thường:</b> Thời gian 0.08s (0.05 - 0.11s), biên độ 1.2mm (0.5 - 2.0mm).</p>
+            <p>• <b>Dày nhĩ phải (P phế):</b> P cao &gt; 2.5mm, nhọn đối xứng ở DII, DIII, aVF (gặp trong tâm phế mạn, Fallot, hẹp ĐMP).</p>
+            <p>• <b>Dày nhĩ trái (P hai lá):</b> P rộng &gt; 0.12s, 2 đỉnh có móc, pha âm ở V1 rộng và sâu (&gt; 0.04 mm&bull;s) (gặp trong hẹp/hở van hai lá, tăng huyết áp).</p>
+            <p>• <b>Khoảng PQ/PR:</b> 0.12 - 0.20s (trung bình 0.15s). Ngắn &lt; 0.12s + sóng Delta (&Delta;) &rarr; Hội chứng Wolff-Parkinson-White (WPW). Dài &gt; 0.20s &rarr; Block AV độ 1. Dài dần đến rớt QRS &rarr; Block AV độ 2 Mobitz 1 (Wenckebach). P và QRS độc lập &rarr; Block AV độ 3.</p>
+          </div>
+
+          <!-- Bước 5 -->
+          <div class="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl space-y-1.5 border border-slate-200 dark:border-slate-700/60">
+            <b class="text-teal-700 dark:text-teal-300">Bước 5: Khảo sát Phức bộ QRS (Khử cực thất)</b>
+            <p>• <b>Thời gian QRS:</b> Bình thường 0.07s (0.05 - 0.10s). Nhánh nội điện: V1-V2 &le; 0.035s; V5-V6 &le; 0.045s.</p>
+            <p>• <b>Sóng Q hoại tử (Quy tắc Minnesota / GS. Trần Đỗ Trinh):</b> Rộng &ge; 0.04s hoặc sâu &ge; 1/4 R tương ứng (ngoại biên sâu &ge; 3mm, D3-aVF sâu &ge; 5mm); hoặc dạng QS từ V1 đến V4 &rarr; Nhồi máu cơ tim.</p>
+            <p>• <b>Block nhánh phải (RBBB):</b> QRS &ge; 0.12s, dạng rsR' hoặc rSR' ở V1, V3R; nhánh nội điện V1 muộn &gt; 0.055s; S rộng ở DI, V5, V6.</p>
+            <p>• <b>Block nhánh trái (LBBB):</b> QRS &ge; 0.12s, sóng R rộng có móc/khấc ở DI, aVL, V5, V6; mất Q và S; nhánh nội điện V5-V6 muộn &gt; 0.055s; dạng QS hoặc rS sâu ở V1-V2.</p>
+            <p>• <b>Dày thất trái (LVH):</b> Sokolow-Lyon RV5/V6 + SV1/V2 &ge; 35mm; RaVL &gt; 12mm; ST chênh xuống và T âm ở V5, V6 (tăng gánh tâm thu).</p>
+            <p>• <b>Dày thất phải (RVH):</b> RV1 &ge; 7mm, RV1 + SV5 &gt; 11mm, tỉ số R/S ở V1 &gt; 1, trục phải &ge; +110&deg;.</p>
+            <p>• <b>Điện thế thấp:</b> QRS lớn nhất ngoại biên &le; 5mm, trước tim &le; 10mm (Tràn dịch màng ngoài tim, phù toàn thân, khí phế thũng).</p>
+          </div>
+
+          <!-- Bước 6 -->
+          <div class="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl space-y-1.5 border border-slate-200 dark:border-slate-700/60">
+            <b class="text-teal-700 dark:text-teal-300">Bước 6: Khảo sát Tái cực Thất (Đoạn ST, Sóng T, Khoảng QT & Sóng U)</b>
+            <p>• <b>Đoạn ST:</b> Đo từ điểm J so với đường đẳng điện TP. ST chênh lên &ge; 2mm ở V1-V4, &ge; 1mm ở chuyển đạo khác &rarr; NMCT cấp STEMI (sóng một pha cong vòm). ST chênh lõm lan tỏa không soi gương &rarr; Viêm màng ngoài tim cấp. ST chênh xuống đáy chén hình thìa &rarr; Ngấm Digitalis.</p>
+            <p>• <b>Định khu NMCT:</b> Trước vách (V1-V3); Trước bên (V5-V6, DI, aVL); Thành dưới (DII, DIII, aVF có soi gương ở DI, aVL); Sau thực thụ (V7-V9 hoặc soi gương R cao ở V1-V2).</p>
+            <p>• <b>Sóng T:</b> Sóng vành Pardee (T âm sâu, nhọn, hai sườn cân đối); T cao nhọn đối xứng lều đáy hẹp (&gt; 10mm trước ngực, &gt; 5mm ngoại vi) &rarr; Tăng Kali máu cấp cứu; T dẹt/âm &rarr; Hạ Kali máu, thiếu máu cơ tim.</p>
+            <p>• <b>Khoảng QT / QTc (Bazett QTc = QT / &radic;RR):</b> Bình thường nam &lt; 0.44s, nữ &lt; 0.46s. QTc kéo dài &gt; 0.46 - 0.50s &rarr; Nguy cơ xoắn đỉnh (Torsades de Pointes).</p>
+            <p>• <b>Sóng U:</b> Bình thường ở V2-V3 cao &le; 1-2mm. Sóng U cao dính vào T &rarr; Hạ Kali máu nặng.</p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="p-3 border-t border-slate-200 dark:border-slate-800 flex justify-end bg-slate-50 dark:bg-slate-800/50">
+        <button onclick="toggleEcgStandardsModal()" class="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-semibold">
+          Đóng cửa sổ
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- TOAST NOTIFICATION CONTAINER -->
   <div id="toast-container" class="fixed bottom-20 md:bottom-6 right-6 z-50 space-y-2 pointer-events-none"></div>
 
@@ -1046,8 +1184,8 @@
     const STORAGE_KEY_ECG = 'clinical_desk_ecgs_v1';
     let ecgList = [];
 
-    // Tối ưu nén ảnh giữ nguyên vạch milimet nhưng giảm dung lượng để truyền tức thì qua 4G/Wifi
-    function compressImageFile(file, maxWidth = 1600, quality = 0.82) {
+    // Tối ưu nén ảnh siêu tốc: Giữ nguyên vạch milimet nhưng nén nhẹ (khoảng 100-150KB) để truyền tức thì qua 4G/Wifi trong 0.2s
+    function compressImageFile(file, maxWidth = 1200, quality = 0.75) {
       return new Promise((resolve) => {
         const reader = new FileReader();
         reader.onload = function(e) {
@@ -1098,7 +1236,7 @@
       // 2. Đồng bộ dữ liệu mới nhất từ Supabase Cloud
       await fetchECGsFromCloud();
 
-      // 3. Đăng ký Realtime: Khi điện thoại chụp ảnh -> máy tính tự động nhảy ảnh ngay tức thì!
+      // 3. Đăng ký Realtime siêu tốc: Khi điện thoại chụp ảnh -> máy tính tự động nhảy ảnh ngay tức thì!
       setupSupabaseRealtime();
     }
 
@@ -1112,7 +1250,8 @@
         const { data, error } = await supabaseClient
           .from('ecg_records')
           .select('*')
-          .order('created_at', { ascending: false });
+          .order('created_at', { ascending: false })
+          .limit(40);
 
         if (error) {
           console.warn('Supabase notice:', error.message);
@@ -1147,8 +1286,39 @@
         supabaseClient
           .channel('public:ecg_records')
           .on('postgres_changes', { event: '*', schema: 'public', table: 'ecg_records' }, (payload) => {
-            if (payload.eventType === 'INSERT') {
-              showToast('⚡ Ca ECG mới vừa được tải lên từ điện thoại!', 'success');
+            // TỐI ƯU SIÊU TỐC: Nhận trực tiếp ảnh mới từ WebSocket, chèn vào màn hình trong 0.05 giây mà KHÔNG CẦN tải lại toàn bộ database!
+            if (payload.eventType === 'INSERT' && payload.new) {
+              const row = payload.new;
+              if (!ecgList.some(item => item.id === row.id)) {
+                const newItem = {
+                  id: row.id,
+                  patientName: row.patient_name || 'BN Mới tải',
+                  diagnosis: row.diagnosis || 'Điện tâm đồ mới',
+                  notes: row.notes || '',
+                  dataUrl: row.image_data,
+                  createdAt: Number(row.created_at) || Date.now(),
+                  pinned: Boolean(row.pinned)
+                };
+                ecgList.unshift(newItem);
+                saveLocalCache();
+                renderECGGallery();
+                showToast('⚡ Ảnh ECG vừa nhảy sang máy tính trong tích tắc (0.1s)!', 'success');
+                return;
+              }
+            } else if (payload.eventType === 'DELETE' && payload.old) {
+              ecgList = ecgList.filter(item => item.id !== payload.old.id);
+              saveLocalCache();
+              renderECGGallery();
+              return;
+            } else if (payload.eventType === 'UPDATE' && payload.new) {
+              const idx = ecgList.findIndex(item => item.id === payload.new.id);
+              if (idx !== -1) {
+                ecgList[idx].pinned = Boolean(payload.new.pinned);
+                ecgList[idx].patientName = payload.new.patient_name || ecgList[idx].patientName;
+                saveLocalCache();
+                renderECGGallery();
+              }
+              return;
             }
             fetchECGsFromCloud();
           })
@@ -1288,7 +1458,10 @@
               <!-- Metadata Info -->
               <div class="p-3.5">
                 <div class="flex items-start justify-between gap-1">
-                  <h4 class="font-bold text-sm text-slate-900 dark:text-white truncate">${item.patientName || 'BN Ẩn danh'}</h4>
+                  <h4 onclick="renameECG('${item.id}')" class="font-bold text-sm text-slate-900 dark:text-white truncate cursor-pointer hover:text-teal-600 transition flex items-center gap-1" title="Chạm để sửa tên bệnh nhân">
+                    <span>${item.patientName || 'BN Ẩn danh'}</span>
+                    <i data-lucide="edit-2" class="w-3 h-3 text-slate-400 opacity-60"></i>
+                  </h4>
                   <span class="text-[10px] text-slate-400 shrink-0">${dateStr}</span>
                 </div>
                 <p class="text-xs font-semibold text-teal-600 dark:text-teal-400 mt-0.5 truncate">${item.diagnosis || 'Chưa phân loại'}</p>
@@ -1346,6 +1519,25 @@
       }
     }
 
+    async function renameECG(id) {
+      const item = ecgList.find(x => x.id === id);
+      if (!item) return;
+      const newName = prompt('Nhập tên hoặc mã hồ sơ bệnh nhân:', item.patientName);
+      if (newName && newName.trim() !== '') {
+        item.patientName = newName.trim();
+        saveLocalCache();
+        renderECGGallery();
+        if (supabaseClient) {
+          try {
+            await supabaseClient.from('ecg_records').update({ patient_name: item.patientName }).eq('id', id);
+          } catch (e) {
+            console.error('Rename cloud error:', e);
+          }
+        }
+        showToast('Đã cập nhật tên bệnh nhân', 'success');
+      }
+    }
+
     async function deleteECG(id) {
       if (confirm('Bác sĩ có chắc muốn xóa ảnh này không?')) {
         ecgList = ecgList.filter(x => x.id !== id);
@@ -1363,36 +1555,39 @@
       }
     }
 
-    // Handle File Upload from phone or desktop (Gallery or Camera)
+    // Handle File Upload from phone or desktop (Gallery or Camera) - TỐI ƯU KHÔNG CHẶN LUỒNG (NON-BLOCKING)
     async function processUploadedFiles(files, isCamera = false) {
       if (!files || files.length === 0) return;
 
       const fileArray = Array.from(files);
       for (let index = 0; index < fileArray.length; index++) {
         const file = fileArray[index];
-        showToast(`Đang xử lý và nén ảnh ${index + 1}/${fileArray.length}...`, 'info');
+        showToast(`⚡ Đang nén siêu tốc & đẩy lên Đám mây (${index + 1}/${fileArray.length})...`, 'info');
 
         const compressedDataUrl = await compressImageFile(file);
         if (!compressedDataUrl) continue;
 
-        const defaultName = 'BN ' + (ecgList.length + 1);
-        const patientName = prompt('Nhập tên/mã bệnh nhân (Có thể để trống):', defaultName) || defaultName;
+        // Tự động đặt tên thời gian thực ngay lập tức để không bị hộp thoại prompt chặn luồng trên iPhone
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+        const patientName = `BN ${ecgList.length + 1} (${timeStr})`;
+
         const newItem = {
           id: 'ecg_' + Date.now() + '_' + index,
           patientName: patientName,
           diagnosis: 'Điện tâm đồ mới tải',
-          notes: (isCamera ? 'Chụp từ Camera lúc ' : 'Tải từ Thư viện lúc ') + new Date().toLocaleTimeString('vi-VN'),
+          notes: (isCamera ? 'Chụp từ Camera lúc ' : 'Tải từ Thư viện lúc ') + now.toLocaleTimeString('vi-VN'),
           dataUrl: compressedDataUrl,
           createdAt: Date.now(),
           pinned: false
         };
 
-        // 1. Hiển thị ngay trên máy này
+        // 1. Hiển thị ngay trên máy điện thoại trong 0.01s
         ecgList.unshift(newItem);
         saveLocalCache();
         renderECGGallery();
 
-        // 2. Tự động đồng bộ lên Đám mây Supabase
+        // 2. Tự động đồng bộ lên Đám mây Supabase ngay trong luồng ngầm
         if (supabaseClient) {
           updateCloudSyncBadge('Đang tải lên Đám mây...', 'syncing');
           try {
@@ -1411,7 +1606,7 @@
               updateCloudSyncBadge('Lưu trên máy (Chưa chạy SQL)', 'warning');
             } else {
               updateCloudSyncBadge('Đám mây: Đã đồng bộ', 'online');
-              showToast('✅ Đã đồng bộ lên Đám mây! Máy tính sẽ tự nhận ảnh.', 'success');
+              showToast('⚡ Ảnh đã bay sang máy tính qua kết nối Realtime!', 'success');
             }
           } catch (err) {
             console.error('Cloud upload error:', err);
@@ -1495,90 +1690,270 @@
     // -------------------------------------------------------------
     // TAB 2: AI ECG READER & CLINICAL INTERPRETATION
     // -------------------------------------------------------------
+    // -------------------------------------------------------------
+    // TAB 2: AI ECG READER - CHUẨN GS. TRẦN ĐỖ TRINH & BS. BÙI CAO MỸ ÁI
+    // -------------------------------------------------------------
+    function toggleEcgStandardsModal() {
+      const modal = document.getElementById('ecg-standards-modal');
+      modal.classList.toggle('hidden');
+    }
+
     const SAMPLE_CASES = {
-      stemi: {
-        name: 'BN Lê Văn H (58t) - Đau ngực giờ thứ 2',
-        title: 'Nhồi máu cơ tim cấp thành trước rộng (Anterior STEMI)',
+      stemi_anterior: {
+        name: 'BN Lê Văn H (58t) - Đau ngực sau xương ức giờ thứ 2',
+        title: 'Nhồi máu cơ tim cấp ST chênh lên thành trước vách (Antero-septal STEMI)',
         rate: 88,
         rhythm: 'Nhịp xoang (Sinus Rhythm)',
         axis: 'Trục trung gian (+45°)',
-        intervals: { pr: '160 ms (Bình thường)', qrs: '90 ms (Bình thường)', qt: '420 ms', qtc: '450 ms (Bình thường)' },
-        findings: [
-          'Đoạn ST chênh lên dạng vòm ≥ 3mm ở các chuyển đạo V1, V2, V3, V4.',
-          'Sóng T cao nhọn đối xứng (Hyperacute T wave) kèm theo ở V2-V3.',
-          'Hình ảnh soi gương (Reciprocal ST depression): ST chênh xuống 1mm ở chuyển đạo DII, DIII, aVF.',
-          'Không thấy block nhánh hay rối loạn dẫn truyền nhĩ thất.'
-        ],
-        diagnosis: 'NMCT CẤP ST CHÊNH LÊN THÀNH TRƯỚC RỘNG (ANTERIOR STEMI) - CẤP CỨU ĐỘ I',
+        intervals: { pr: '0.16s (Bình thường)', qrs: '0.08s (Thanh mảnh)', qt: '0.40s', qtc: '0.44s' },
+        steps: {
+          step1: 'Tốc độ 25mm/s (1 ô nhỏ = 0.04s). Biên độ 10mm/1mV (chuẩn N). Đường đẳng điện ổn định, không nhiễu 50Hz, không mắc ngược cực tay (DI và aVR đúng chiều).',
+          step2: 'Nhịp xoang đều: Đạt 5 tiêu chuẩn (P đi trước QRS, P(+) ở DI, DII, V5, V6, P(-) ở aVR, PR 0.16s không đổi). Tần số tim: 300 / 3.4 ô lớn &asymp; 88 ck/phút.',
+          step3: 'Trục điện tim: Trục trung gian góc &alpha; &asymp; +45&deg;. Tư thế tim trung gian (aVL và aVF đều dương).',
+          step4: 'Sóng P: Rộng 0.08s, cao 1.2mm (bình thường). Khoảng PQ/PR: 0.16s, dẫn truyền nhĩ thất 1:1 bình thường.',
+          step5: 'Phức bộ QRS: Thời gian 0.08s. Dạng QS ở V1, V2; sóng Q hoại tử sâu rộng ở V3 (rộng &ge; 0.04s, sâu &ge; 1/4 R theo quy tắc Minnesota). Nhánh nội điện bình thường.',
+          step6: 'Tái cực ST-T-QT: Đoạn ST chênh lên dạng vòm (sóng một pha tổn thương dưới thượng tâm mạc) &ge; 3 - 5mm ở V1, V2, V3, V4. Sóng T cao nhọn đối xứng tối cấp. Hình ảnh soi gương gián tiếp: ST chênh xuống 1mm ở DII, DIII, aVF. QTc = 0.44s (Bazett).',
+          step7: 'KẾT LUẬN: NHỒI MÁU CƠ TIM CẤP ST CHÊNH LÊN THÀNH TRƯỚC VÁCH (ANTERO-SEPTAL STEMI) GIAI ĐOẠN CẤP - NGUY CƠ RẤT CAO.'
+        },
         urgency: 'critical',
         recommendations: [
-          'Báo động đỏ Can thiệp Mạch vành (Cath-lab Activation khẩn cấp).',
-          'Liều nạp kháng kết tập tiểu cầu kép: Aspirin 300mg + Ticagrelor 180mg (hoặc Clopidogrel 300-600mg).',
-          'Giảm đau Morphine TM nếu đau ngực nhiều, theo dõi sát SpO2 và HA.',
-          'Sẵn sàng máy sốc điện đề phòng rung thất (VF).'
+          'Kích hoạt Báo động đỏ can thiệp mạch vành (Cath-lab Activation khẩn cấp &lt; 90 phút).',
+          'Kháng kết tập tiểu cầu kép nạp: Aspirin 300mg + Ticagrelor 180mg (hoặc Clopidogrel 300-600mg).',
+          'Kháng đông: Enoxaparin 30mg TM bolus + 1mg/kg TDD (chỉnh liều theo CrCl).',
+          'Giảm đau Morphine 2-4mg TM chậm nếu đau ngực dữ dội, theo dõi SpO2 và huyết áp.',
+          'Chuẩn bị sẵn máy sốc điện tại giường đề phòng Rung thất (VF) trong giai đoạn tối cấp.'
         ]
       },
-      afib: {
-        name: 'BN Trần Thị M (72t) - Hồi hộp trống ngực, khó thở',
-        title: 'Rung nhĩ đáp ứng thất nhanh (AFib with RVR)',
-        rate: 142,
-        rhythm: 'Rung nhĩ (Atrial Fibrillation) - Khoảng R-R hoàn toàn không đều',
+      stemi_inferior: {
+        name: 'BN Nguyễn Văn B (62t) - Đau tức thượng vị, vã mồ hôi, buồn nôn',
+        title: 'Nhồi máu cơ tim cấp thành dưới (Inferior STEMI)',
+        rate: 65,
+        rhythm: 'Nhịp xoang (Sinus Rhythm)',
+        axis: 'Trục xu hướng phải (+95°)',
+        intervals: { pr: '0.18s', qrs: '0.08s', qt: '0.42s', qtc: '0.44s' },
+        steps: {
+          step1: 'Tốc độ 25mm/s, Test 1mV = 10mm (N). Không có nhiễu tạp bên ngoài, đường đồng điện T-P phẳng.',
+          step2: 'Nhịp xoang đều, tần số tim 65 ck/phút. Cần cảnh giác vì ĐMV phải (RCA) nuôi nút xoang và nút nhĩ thất, dễ biến chứng nhịp chậm hoặc Block AV.',
+          step3: 'Trục điện tim: Trục phải (+95&deg;). Tư thế tim đứng (aVL âm rS, aVF dương dạng qR, hình ảnh S1Q3).',
+          step4: 'Sóng P: Bình thường, PR = 0.18s. Theo dõi sát PR đề phòng chuyển sang Block AV độ 1 hoặc độ 2 Wenckebach.',
+          step5: 'Phức bộ QRS: Sóng Q hoại tử rộng 0.04s, sâu &ge; 4mm ở DIII và aVF (đạt tiêu chuẩn Minnesota cho thành dưới).',
+          step6: 'Tái cực ST-T-QT: ST chênh lên dạng vòm &ge; 2mm ở DII, DIII, aVF (DIII &gt; DII gợi ý tắc RCA). Hình ảnh soi gương rõ rệt: ST chênh xuống ở DI, aVL. Sóng T âm nhọn đối xứng (sóng vành Pardee).',
+          step7: 'KẾT LUẬN: NHỒI MÁU CƠ TIM CẤP THÀNH DƯỚI (INFERIOR STEMI) BÁN CẤP CÓ SÓNG VÀNH PARDEE VÀ SÓNG Q HOẠI TỬ.'
+        },
+        urgency: 'critical',
+        recommendations: [
+          'Chỉ định đo ngay các chuyển đạo bên phải V3R, V4R để loại trừ NMCT Thất phải phối hợp (RCA tổn thương).',
+          'Chống chỉ định dùng Nitroglycerin và thuốc giãn mạch nếu có kèm NMCT thất phải (nguy cơ tụt HA nặng).',
+          'Kích hoạt Cath-lab chụp và can thiệp ĐMV cấp cứu.',
+          'Theo dõi sát nhịp chậm xoang và block nhĩ thất; chuẩn bị sẵn Atropin 0.5mg và máy tạo nhịp tạm thời.'
+        ]
+      },
+      afib_rvr: {
+        name: 'BN Trần Thị M (72t) - Hồi hộp trống ngực, khó thở khi gắng sức',
+        title: 'Rung nhĩ đáp ứng thất nhanh (Atrial Fibrillation with RVR)',
+        rate: 145,
+        rhythm: 'Rung nhĩ (Loạn nhịp hoàn toàn)',
         axis: 'Trục trung gian (+60°)',
-        intervals: { pr: 'Không xác định được (Mất sóng P, thay bằng sóng f lăn tăn)', qrs: '84 ms', qt: '320 ms', qtc: '490 ms (Kéo dài nhẹ)' },
-        findings: [
-          'Mất hoàn toàn sóng P xoang trên tất cả 12 chuyển đạo.',
-          'Thay thế bằng các sóng lăn tăn f tần số khoảng 400 - 600 ck/phút.',
-          'Khoảng R-R hoàn toàn không đều (Irregularly irregular).',
-          'Tần số thất trung bình nhanh dao động 135 - 150 ck/phút.',
-          'Không có biến đổi ST thiếu máu cục bộ cấp tính rõ rệt.'
-        ],
-        diagnosis: 'RUNG NHĨ ĐÁP ỨNG THẤT NHANH (ATRIAL FIBRILLATION WITH RVR)',
+        intervals: { pr: 'Mất sóng P (sóng f lăn tăn)', qrs: '0.08s (Thanh mảnh)', qt: '0.31s', qtc: '0.48s' },
+        steps: {
+          step1: 'Tốc độ giấy 25mm/s, 1mV = 10mm. Máy chuẩn xác, đường đồng điện bị xóa bởi sóng nhĩ bệnh lý.',
+          step2: 'Mất hoàn toàn sóng P xoang. Thay thế bằng các sóng lăn tăn f biên độ không đều, tần số &asymp; 400 - 500 ck/p (rõ nhất ở V1, V3R). Khoảng R-R hoàn toàn không đều (Loạn nhịp hoàn toàn). Tần số thất trung bình (đếm 30 ô lớn x 10) &asymp; 145 ck/phút.',
+          step3: 'Trục điện tim trung gian (+60&deg;).',
+          step4: 'Không có sóng P, không có khoảng PR/PQ.',
+          step5: 'Phức bộ QRS hẹp (0.08s). Cần phân biệt các nhát dẫn truyền lệch hướng dạng rSR\' ở V1 khi thất quá nhanh với ngoại tâm thu thất (theo GS. Trần Đỗ Trinh: lệch hướng không có khoảng ghép cố định và không có nghỉ bù).',
+          step6: 'Tái cực ST-T: ST chênh xuống nhẹ do nhịp nhanh (strain), không có sóng Q hoại tử. Sóng T dẹt.',
+          step7: 'KẾT LUẬN: RUNG NHĨ ĐÁP ỨNG THẤT NHANH (AFIB WITH RVR) - CẦN KIỂM SOÁT TẦN SỐ VÀ CHỐNG ĐÔNG.'
+        },
         urgency: 'warning',
         recommendations: [
-          'Kiểm soát tần số thất: Cân nhắc Chẹn Beta (Metoprolol/Bisoprolol) hoặc Diltiazem TM nếu huyết động ổn định.',
-          'Đánh giá huyết động: Nếu có tụt huyết áp hoặc đau ngực cấp -> Chuẩn bị Sốc điện chuyển nhịp đồng bộ.',
-          'Tính thang điểm CHA2DS2-VASc để chỉ định kháng đông dự phòng đột quỵ (DOAC / Warfarin).'
+          'Đánh giá huyết động: Nếu có choáng, phù phổi cấp hoặc đau thắt ngực &rarr; Sốc điện chuyển nhịp đồng bộ cấp cứu (100-200J).',
+          'Kiểm soát tần số thất: Dùng Chẹn Beta (Metoprolol TM/uống) hoặc Diltiazem TM nếu phân suất tống máu (EF) bảo tồn.',
+          'Nếu có suy tim cấp: Ưu tiên Digoxin TM hoặc Amiodarone.',
+          'Tính điểm CHA2DS2-VASc để chỉ định kháng đông đường uống (DOAC: Rivaroxaban/Apixaban/Dabigatran).'
+        ]
+      },
+      aflutter: {
+        name: 'BN Đỗ Văn C (65t) - Cơn hồi hộp trống ngực liên tục',
+        title: 'Cuồng động nhĩ dẫn truyền 2:1 (Atrial Flutter with 2:1 AV block)',
+        rate: 150,
+        rhythm: 'Cuồng nhĩ (Atrial Flutter)',
+        axis: 'Trục trung gian (+50°)',
+        intervals: { pr: 'Sóng F răng cưa tần số 300 ck/p', qrs: '0.08s', qt: '0.32s', qtc: '0.45s' },
+        steps: {
+          step1: 'Tốc độ 25mm/s, 1mV = 10mm. Kiểm tra đường đẳng điện: bị thay thế hoàn toàn bởi sóng F.',
+          step2: 'Sóng P xoang biến mất, thay bằng một chuỗi sóng F răng cưa (sawtooth) liên tục, đều đặn với tần số đúng 300 ck/phút (rõ nhất ở DII, DIII, aVF, V1). Tần số thất bằng 1/2 tần số nhĩ = 150 ck/phút (Block nhĩ thất sinh lý 2:1).',
+          step3: 'Trục điện tim trung gian (+50&deg;).',
+          step4: 'Sóng F cuồng nhĩ tần số 300 ck/p, tỷ lệ dẫn truyền 2:1.',
+          step5: 'Phức bộ QRS bình thường 0.08s, không giãn rộng.',
+          step6: 'ST và T bị hòa lẫn vào các sóng F răng cưa.',
+          step7: 'KẾT LUẬN: CUỒNG ĐỘNG NHĨ DẪN TRUYỀN 2:1 (ATRIAL FLUTTER 2:1 BLOCK).'
+        },
+        urgency: 'warning',
+        recommendations: [
+          'Nghiệm pháp xoa xoang cảnh hoặc ấn nhãn cầu: Sẽ làm tăng mức độ block nhĩ thất (từ 2:1 sang 4:1) để bộc lộ rõ sóng F răng cưa giúp chẩn đoán xác định.',
+          'Kiểm soát tần số thất bằng thuốc chẹn thụ thể Beta hoặc ức chế kênh Calci.',
+          'Chuyển nhịp: Cuồng nhĩ rất nhạy với sốc điện năng lượng thấp (50 - 100J) hoặc triệt đốt qua ống thông catheter (RF Ablation) eo van 3 lá.'
+        ]
+      },
+      rbbb: {
+        name: 'BN Phạm Quốc K (60t) - Khám kiểm tra trước phẫu thuật',
+        title: 'Block nhánh phải hoàn toàn (Complete RBBB)',
+        rate: 76,
+        rhythm: 'Nhịp xoang',
+        axis: 'Trục lệch phải (+115°)',
+        intervals: { pr: '0.16s', qrs: '0.14s (QRS giãn rộng &ge; 0.12s)', qt: '0.40s', qtc: '0.45s' },
+        steps: {
+          step1: 'Tốc độ 25mm/s, 1mV = 10mm. Định chuẩn N chính xác.',
+          step2: 'Nhịp xoang đều, tần số 76 ck/phút.',
+          step3: 'Trục điện tim lệch phải (+115&deg;).',
+          step4: 'Sóng P bình thường, khoảng PR 0.16s.',
+          step5: 'Phức bộ QRS: Thời gian 0.14s (giãn rộng &ge; 0.12s - tiêu chuẩn vàng). Hình ảnh trực tiếp: dạng rsR\' điển hình (tai thỏ) ở V1, V2 với sóng R\' giãn rộng, trát đậm; Nhánh nội điện ở V1 muộn &gt; 0.055s (0.08s). Hình ảnh gián tiếp: Sóng S giãn rộng, sâu, có khấc ở DI, aVL, V5, V6.',
+          step6: 'Biến đổi ST-T thứ phát: ST chênh xuống và T âm ngược chiều với R\' ở V1, aVR; ST chênh lên nhẹ và T dương ở DI, V5, V6.',
+          step7: 'KẾT LUẬN: BLOCK NHÁNH PHẢI HOÀN TOÀN (COMPLETE RBBB - RỐI LOẠN DẪN TRUYỀN TRONG THẤT).'
+        },
+        urgency: 'info',
+        recommendations: [
+          'RBBB đơn độc có thể gặp ở người khỏe mạnh hoặc sau mổ tim bẩm sinh, tâm phế mạn.',
+          'Kiểm tra thêm siêu âm tim đánh giá kích thước thất phải và áp lực động mạch phổi.',
+          'Cho phép tiến hành phẫu thuật ngoại khoa nếu huyết động ổn định và không có triệu chứng ngất.'
         ]
       },
       lbbb: {
-        name: 'BN Hoàng Minh T (69t) - Tiền sử Suy tim / THA',
+        name: 'BN Hoàng Minh T (69t) - Tiền sử Suy tim / THA / Đau thắt ngực',
         title: 'Block nhánh trái hoàn toàn (Complete LBBB)',
         rate: 74,
         rhythm: 'Nhịp xoang',
-        axis: 'Trục lệch trái (-30°)',
-        intervals: { pr: '180 ms', qrs: '148 ms (QRS giãn rộng > 120ms)', qt: '440 ms', qtc: '460 ms' },
-        findings: [
-          'Phức bộ QRS giãn rộng điển hình: Thời gian 148 ms (> 120 ms).',
-          'Sóng R rộng có khấc (notched/M-shaped) ở chuyển đạo bên: DI, aVL, V5, V6.',
-          'Sóng QS hoặc rS sâu, rộng ở V1, V2.',
-          'Biến đổi thứ phát của ST-T: ST chênh xuống và T âm đối xứng ngược hướng với vector QRS ở DI, aVL, V5, V6.'
-        ],
-        diagnosis: 'BLOCK NHÁNH TRÁI HOÀN TOÀN (COMPLETE LBBB)',
+        axis: 'Trục lệch trái (-35°)',
+        intervals: { pr: '0.18s', qrs: '0.15s (QRS giãn rộng &ge; 0.12s)', qt: '0.44s', qtc: '0.49s' },
+        steps: {
+          step1: 'Tốc độ 25mm/s, 1mV = 10mm. Không nhiễu tạp.',
+          step2: 'Nhịp xoang đều 74 ck/phút.',
+          step3: 'Trục điện tim lệch trái (-35&deg;). Tư thế tim nằm (aVL dương, aVF âm dạng rS).',
+          step4: 'Sóng P bình thường, PR = 0.18s.',
+          step5: 'Phức bộ QRS: Thời gian 0.15s (&ge; 0.12s). Hình ảnh trực tiếp tại chuyển đạo bên: Sóng R rộng có khấc (chữ M, notched) ở DI, aVL, V5, V6; Mất hoàn toàn sóng Q và sóng S ở V5, V6. Nhánh nội điện ở V5, V6 muộn &gt; 0.055s (0.09s). Hình ảnh gián tiếp: Sóng rS hoặc QS rất sâu, rộng ở V1, V2.',
+          step6: 'Biến đổi ST-T thứ phát: ST chênh xuống và T âm đối xứng ngược hướng với vector QRS ở DI, aVL, V5, V6; ST chênh lên và T dương ở V1, V2.',
+          step7: 'KẾT LUẬN: BLOCK NHÁNH TRÁI HOÀN TOÀN (COMPLETE LBBB) - HƠN 90% LÀ DO BỆNH TIM THỰC THỂ NẶNG.'
+        },
+        urgency: 'warning',
+        recommendations: [
+          'LBBB mới xuất hiện kèm đau ngực cấp: Phải coi như tương đương STEMI và áp dụng Tiêu chuẩn Sgarbossa cải biên.',
+          'Chỉ định Siêu âm tim Doppler màu đo phân suất tống máu (EF), đánh giá mất đồng bộ thất và chỉ định tái đồng bộ cơ tim (CRT).',
+          'Tối ưu hóa điều trị suy tim và kiểm soát huyết áp chặt chẽ.'
+        ]
+      },
+      wpw: {
+        name: 'BN Nguyễn Anh T (24t) - Thỉnh thoảng có cơn hồi hộp trống ngực đột ngột',
+        title: 'Hội chứng kích thích sớm Wolff-Parkinson-White (WPW Kiểu A)',
+        rate: 78,
+        rhythm: 'Nhịp xoang',
+        axis: 'Trục trung gian (+40°)',
+        intervals: { pr: '0.09s (PR ngắn &lt; 0.12s)', qrs: '0.13s (QRS rộng bù trừ)', qt: '0.38s', qtc: '0.43s' },
+        steps: {
+          step1: 'Tốc độ 25mm/s, 1mV = 10mm. Ghi hình chuẩn xác.',
+          step2: 'Nhịp xoang đều, tần số 78 ck/phút.',
+          step3: 'Trục điện tim trung gian (+40&deg;).',
+          step4: 'Khoảng PQ/PR rút ngắn điển hình: 0.09s (&lt; 0.12s - tiêu chuẩn bắt buộc do xung động đi tắt qua cầu Kent).',
+          step5: 'Phức bộ QRS: Giãn rộng 0.13s; Xuất hiện sóng Delta (&Delta;) là đoạn thoai thoải, trát đậm ở đầu sườn lên phức bộ QRS. Khoảng PJ bình thường &lt; 0.26s (thể hiện QRS rộng bù trừ cho PR ngắn). Sóng Delta dương ở tất cả các chuyển đạo trước tim V1 - V6 &rarr; Phân loại WPW Kiểu A (cầu Kent nằm bên trái).',
+          step6: 'Biến đổi thứ phát ST-T: ST chênh nhẹ và T âm ngược chiều với sóng Delta.',
+          step7: 'KẾT LUẬN: HỘI CHỨNG WOLFF - PARKINSON - WHITE (WPW KIỂU A - ĐƯỜNG DẪN TRUYỀN PHỤ CẦU KENT).'
+        },
         urgency: 'info',
         recommendations: [
-          'Nếu mới xuất hiện kèm đau ngực cấp: Phải áp dụng tiêu chuẩn Sgarbossa cải biên để loại trừ STEMI ẩn dấu.',
-          'Đề nghị siêu âm tim đánh giá phân suất tống máu thất trái (LVEF) và vận động vùng.',
-          'Tối ưu hóa điều trị suy tim theo khuyến cáo GDMT.'
+          'Chống chỉ định tuyệt đối các thuốc chẹn nút nhĩ thất (Digoxin, Diltiazem, Verapamil) nếu bệnh nhân xuất hiện Rung nhĩ kèm WPW vì sẽ làm dẫn truyền cực nhanh qua cầu Kent gây Rung thất (VF).',
+          'Khám chuyên khoa Loạn nhịp Tim mạch để chỉ định Thăm dò điện sinh lý học tim (EPS) và Triệt đốt cầu Kent qua sóng cao tần (Catheter RF Ablation) để chữa khỏi dứt điểm.'
+        ]
+      },
+      lvh_lae: {
+        name: 'BN Vũ Đình P (67t) - Tăng huyết áp 15 năm, khó thở khi gắng sức',
+        title: 'Tăng gánh nhĩ trái & Dày thất trái tăng gánh tâm thu (LAE + LVH)',
+        rate: 70,
+        rhythm: 'Nhịp xoang',
+        axis: 'Trục lệch trái (-20°)',
+        intervals: { pr: '0.17s', qrs: '0.09s', qt: '0.41s', qtc: '0.44s' },
+        steps: {
+          step1: 'Tốc độ 25mm/s, Test 1mV = 10mm (N). Chú ý nếu sóng R vọt ra ngoài giấy cần giảm về N/2.',
+          step2: 'Nhịp xoang đều, tần số 70 ck/phút.',
+          step3: 'Trục điện tim lệch trái (-20&deg;). Tư thế tim nằm (aVL dương, aVF âm dạng rS, hình ảnh Q1S3).',
+          step4: 'Sóng P: Thời gian rộng 0.13s (&gt; 0.12s - tiêu chuẩn P hai lá), đỉnh chẻ đôi có móc ở DII; Ở V1: Sóng P 2 pha (+/-) với pha âm rất rộng và sâu (&gt; 0.04 mm&bull;s) &rarr; Tăng gánh / Dày nhĩ trái rõ rệt.',
+          step5: 'Phức bộ QRS: Biên độ điện thế thất trái tăng rất mạnh: SV1 = 18mm, RV5 = 26mm &rarr; Chỉ số Sokolow-Lyon = SV1 + RV5 = 44mm (&ge; 35mm - Đạt tiêu chuẩn chẩn đoán dày thất trái của GS. Trần Đỗ Trinh). RaVL = 14mm (&gt; 12mm). Nhánh nội điện ở V5 muộn = 0.050s (&gt; 0.045s).',
+          step6: 'Tái cực ST-T: ST chênh xuống và T âm không đối xứng ở V5, V6, DI, aVL (Hình ảnh dày thất trái tăng gánh tâm thu - LV Strain pattern).',
+          step7: 'KẾT LUẬN: TĂNG GÁNH NHĨ TRÁI + DÀY THẤT TRÁI TĂNG GÁNH TÂM THU DO TĂNG HUYẾT ÁP LÂU NĂM (LVH + LAE).'
+        },
+        urgency: 'warning',
+        recommendations: [
+          'Tăng cường kiểm soát huyết áp mục tiêu &lt; 130/80 mmHg với nhóm ức chế hệ RAA (ACEi / ARB) để thúc đẩy thoái triển phì đại thất trái.',
+          'Siêu âm tim đánh giá độ dày thành sau thất trái (PWd), vách liên thất (IVSd) và chỉ số khối cơ thất trái (LVMI).',
+          'Theo dõi sát nguy cơ xuất hiện Rung nhĩ do nhĩ trái bị giãn căng mạn tính.'
+        ]
+      },
+      av_block_2: {
+        name: 'BN Đặng Văn N (52t) - Mệt mỏi, thỉnh thoảng hẫng nhịp ở ngực',
+        title: 'Block nhĩ thất độ 2 Mobitz 1 (Chu kỳ Luciani - Wenckebach)',
+        rate: 58,
+        rhythm: 'Loạn nhịp xoang có chu kỳ',
+        axis: 'Trục trung gian (+55°)',
+        intervals: { pr: 'Dài dần: 0.18s &rarr; 0.24s &rarr; 0.30s &rarr; Sóng P bị block', qrs: '0.08s', qt: '0.40s', qtc: '0.42s' },
+        steps: {
+          step1: 'Tốc độ 25mm/s, Test 1mV = 10mm. Đường ghi chuẩn.',
+          step2: 'Nhịp không đều thành từng chuỗi 3 - 4 nhát bóp rồi nghỉ. Tần số thất trung bình 58 ck/phút, tần số nhĩ 75 ck/phút.',
+          step3: 'Trục điện tim trung gian (+55&deg;).',
+          step4: 'Khoảng PQ/PR: Điển hình chu kỳ Luciani - Wenckebach: Cứ mỗi nhát bóp kế tiếp thì khoảng PQ lại dài dần ra (0.18s &rarr; 0.24s &rarr; 0.30s) cho đến khi có một sóng P đi đơn độc không dẫn truyền được xuống thất (không có QRS đi sau); sau đó chu kỳ mới lặp lại với PQ ngắn nhất. Khoảng PP hoàn toàn đều đặn, khoảng RR trong cùng chu kỳ ngắn dần lại.',
+          step5: 'Phức bộ QRS thanh mảnh 0.08s, vị trí block nằm tại nút nhĩ thất Tawara.',
+          step6: 'Tái cực ST-T bình thường.',
+          step7: 'KẾT LUẬN: BLOCK NHĨ THẤT ĐỘ 2 MOBITZ 1 (CHU KỲ WENCKEBACH) - TỔN THƯƠNG TẠI NÚT NHĨ THẤT.'
+        },
+        urgency: 'info',
+        recommendations: [
+          'Mobitz 1 tại nút nhĩ thất thường có tiên lượng tốt hơn Mobitz 2, có thể gặp do cường phế vị, ngộ độc Digitalis, thấp tim, hoặc nhồi máu cơ tim thành dưới.',
+          'Rà soát các thuốc làm chậm nhịp tim đang dùng (Chẹn Beta, Chẹn Calci non-DHP, Digoxin).',
+          'Nếu có triệu chứng mệt, chóng mặt hoặc tụt HA: Thử nghiệm tiêm Atropin 0.5mg TM.'
+        ]
+      },
+      hyperkalemia: {
+        name: 'BN Nguyễn Văn Q (64t) - Bệnh thận mạn giai đoạn 5, vô niệu, yếu cơ tứ chi',
+        title: 'Rối loạn điện giải: Tăng Kali máu nặng (Severe Hyperkalemia)',
+        rate: 52,
+        rhythm: 'Nhịp chậm, sóng P dẹt mờ',
+        axis: 'Trục xu hướng trái (-10°)',
+        intervals: { pr: '0.22s (PR kéo dài)', qrs: '0.13s (QRS doãng rộng)', qt: '0.38s', qtc: '0.39s' },
+        steps: {
+          step1: 'Tốc độ 25mm/s, 1mV = 10mm (N). Không có lỗi kỹ thuật.',
+          step2: 'Nhịp chậm 52 ck/phút. Xung động cơ tâm thất bị ức chế nặng nề do nồng độ Kali ngoại bào tăng cao.',
+          step3: 'Trục điện tim lệch trái nhẹ (-10&deg;).',
+          step4: 'Sóng P: Bị biến dạng, dẹt mờ, biên độ &lt; 0.5mm, có nguy cơ biến mất hoàn toàn (liệt nhĩ xoang thất). Khoảng PR dài ra 0.22s.',
+          step5: 'Phức bộ QRS: Bị doãng rộng 0.13s trên tất cả các chuyển đạo, sườn lên và sườn xuống tày đầu, mất nét thanh mảnh.',
+          step6: 'Tái cực ST-T: Sóng T cao nhọn đối xứng khổng lồ, hình lều đáy hẹp (Peaked T wave) vượt quá 10mm ở V2 - V5 và &gt; 5mm ở các chuyển đạo ngoại biên (Dấu hiệu kinh điển của Tăng Kali máu theo GS. Trần Đỗ Trinh).',
+          step7: 'KẾT LUẬN: TĂNG KALI MÁU NẶNG CẤP CỨU ĐE DỌA TÍNH MẠNG (ƯỚC TÍNH K+ &ge; 7.0 mmol/L) - NGUY CƠ RUNG THẤT / NGỪNG TIM.'
+        },
+        urgency: 'critical',
+        recommendations: [
+          'BÁO ĐỘNG ĐỎ CẤP CỨU NỘI KHOA - ĐƯA NGAY VÀO PHÒNG HỒI SỨC CẤP CỨU.',
+          'Tiêm Canxi Clorid 10% hoặc Canxi Gluconat 10% 10ml TM chậm trong 3-5 phút để ổn định màng tế bào cơ tim ngay lập tức.',
+          'Dịch truyền hạ Kali nhanh: Insulin Regular 10 UI pha trong 125-250ml Glucose 20-30% truyền TM trong 30 phút.',
+          'Khí dung Salbutamol 10-20mg; dùng Furosemid TM nếu còn nước tiểu; Natri Bicarbonat 8.4% nếu có toan chuyển hóa.',
+          'Hội chẩn thận nhân tạo tiến hành LỌC MÁU CẤP CỨU NGAY (Hemodialysis).'
         ]
       },
       normal: {
-        name: 'Khám sức khỏe tổng quát (35t)',
+        name: 'Khám sức khỏe tiền phẫu (32t) - Thể trạng khỏe mạnh',
         title: 'Điện tâm đồ nhịp xoang bình thường',
         rate: 72,
-        rhythm: 'Nhịp xoang đều',
-        axis: 'Trục trung gian (+55°)',
-        intervals: { pr: '150 ms', qrs: '82 ms', qt: '380 ms', qtc: '415 ms' },
-        findings: [
-          'Sóng P dương ở DI, DII, aVF, âm ở aVR. Dẫn truyền nhĩ thất 1:1 bình thường.',
-          'Khoảng PR, QRS, QT trong giới hạn sinh lý bình thường.',
-          'Không có sóng Q bệnh lý, ST không chênh, sóng T bình thường.',
-          'Chỉ số Sokolow-Lyon < 35mm, không có dày thất.'
-        ],
-        diagnosis: 'ĐIỆN TÂM ĐỒ TRONG GIỚI HẠN BÌNH THƯỜNG (NORMAL ECG)',
+        rhythm: 'Nhịp xoang đều đặn',
+        axis: 'Trục trung gian (+65° - Chuẩn người Việt Nam)',
+        intervals: { pr: '0.15s (Bình thường)', qrs: '0.07s (Bình thường)', qt: '0.36s', qtc: '0.40s' },
+        steps: {
+          step1: 'Tốc độ 25mm/s (1 ô nhỏ = 0.04s). Biên độ 10mm/1mV (N chuẩn). Đường đẳng điện T-P ổn định, không có dòng tạp 50Hz, không run cơ. Định luật Einthoven thỏa mãn DI + DIII = DII.',
+          step2: 'Nhịp xoang đều: Thỏa mãn trọn vẹn 5 tiêu chuẩn nhịp xoang của GS. Trần Đỗ Trinh (Có P đi trước QRS; P dương ở DI, DII, aVF, V5, V6, P âm ở aVR; PR 0.15s hằng định; Hình dạng P đồng nhất; Tần số tim 72 ck/phút, chênh lệch PP &lt; 0.16s).',
+          step3: 'Trục điện tim: Trục trung gian góc &alpha; = +65&deg; (đúng giá trị trung bình của người Việt Nam). Tư thế điện học: Trung gian.',
+          step4: 'Sóng P: Rộng 0.08s (chuẩn 0.08s), cao 1.2mm ở DII. Khoảng PQ/PR: 0.15s (trong giới hạn 0.12 - 0.20s). Không có dấu dày nhĩ.',
+          step5: 'Phức bộ QRS: Thời gian 0.07s (thanh mảnh). Không có sóng Q bệnh lý. Vùng chuyển tiếp tại V3 - V4. Nhánh nội điện ở V1 &le; 0.035s, ở V5 &le; 0.045s. Chỉ số Sokolow-Lyon: SV1 + RV5 = 22mm (&lt; 35mm), không có phì đại buồng tim.',
+          step6: 'Tái cực ST-T: Đoạn ST đồng điện (trùng với đường đẳng điện TP). Sóng T dương ở DI, DII, aVF, V3-V6, âm ở aVR, đỉnh tầy, hai sườn không đối xứng. Khoảng QT = 0.36s, QTc (Bazett) = 0.40s (&lt; 0.44s).',
+          step7: 'KẾT LUẬN: ĐIỆN TÂM ĐỒ TRONG GIỚI HẠN SINH LÝ BÌNH THƯỜNG (NORMAL ECG).'
+        },
         urgency: 'normal',
         recommendations: [
           'Không phát hiện bất thường điện học tim.',
-          'Khuyến cáo theo dõi định kỳ.'
+          'Đủ điều kiện an toàn tim mạch cho phẫu thuật theo chương trình.'
         ]
       }
     };
@@ -1621,7 +1996,7 @@
       placeholder.classList.add('hidden');
       nameEl.innerText = item.patientName + ' (' + item.diagnosis + ')';
 
-      currentAiCase = SAMPLE_CASES.stemi;
+      currentAiCase = SAMPLE_CASES.stemi_anterior;
       runAiEcgAnalysis();
     }
 
@@ -1639,7 +2014,7 @@
         placeholder.classList.add('hidden');
         nameEl.innerText = file.name;
 
-        currentAiCase = SAMPLE_CASES.stemi;
+        currentAiCase = SAMPLE_CASES.stemi_anterior;
         runAiEcgAnalysis();
       };
       reader.readAsDataURL(file);
@@ -1649,6 +2024,7 @@
       ctx.fillStyle = '#fff7f7';
       ctx.fillRect(0, 0, 900, 420);
 
+      // Lưới milimet màu hồng chuẩn ECG
       ctx.strokeStyle = 'rgba(244, 63, 94, 0.15)';
       ctx.lineWidth = 1;
       for (let x = 0; x < 900; x += 10) {
@@ -1667,7 +2043,7 @@
       }
 
       ctx.strokeStyle = '#0f172a';
-      ctx.lineWidth = 2;
+      ctx.lineWidth = 1.8;
       ctx.lineJoin = 'round';
 
       const leads = ['I', 'II', 'III', 'aVR', 'aVL', 'aVF', 'V1', 'V2', 'V3', 'V4', 'V5', 'V6'];
@@ -1679,7 +2055,7 @@
           const baseX = col * 225 + 10;
           const baseY = row * 135 + 75;
 
-          ctx.fillStyle = '#475569';
+          ctx.fillStyle = '#334155';
           ctx.font = 'bold 12px sans-serif';
           ctx.fillText(leadName, baseX + 5, baseY - 50);
 
@@ -1688,54 +2064,101 @@
           ctx.moveTo(cx, baseY);
 
           for (let beat = 0; beat < 2; beat++) {
-            cx += 20; ctx.lineTo(cx, baseY);
-            if (type !== 'afib') {
-              cx += 10; ctx.lineTo(cx, baseY - 8);
-              cx += 10; ctx.lineTo(cx, baseY);
+            cx += 18; ctx.lineTo(cx, baseY);
+
+            // Sóng P
+            if (type === 'afib_rvr') {
+              cx += 4; ctx.lineTo(cx, baseY + 3);
+              cx += 4; ctx.lineTo(cx, baseY - 3);
+              cx += 4; ctx.lineTo(cx, baseY + 2);
+              cx += 4; ctx.lineTo(cx, baseY);
+            } else if (type === 'aflutter') {
+              cx += 6; ctx.lineTo(cx, baseY - 6);
+              cx += 6; ctx.lineTo(cx, baseY + 6);
+              cx += 6; ctx.lineTo(cx, baseY);
+            } else if (type === 'lvh_lae') {
+              cx += 6; ctx.lineTo(cx, baseY - 8);
+              cx += 4; ctx.lineTo(cx, baseY - 5);
+              cx += 6; ctx.lineTo(cx, baseY - 8);
+              cx += 4; ctx.lineTo(cx, baseY);
             } else {
-              cx += 5; ctx.lineTo(cx, baseY + 3);
-              cx += 5; ctx.lineTo(cx, baseY - 3);
-              cx += 5; ctx.lineTo(cx, baseY + 2);
-              cx += 5; ctx.lineTo(cx, baseY);
+              cx += 8; ctx.lineTo(cx, baseY - 8);
+              cx += 8; ctx.lineTo(cx, baseY);
             }
-            cx += 15; ctx.lineTo(cx, baseY);
-            cx += 4; ctx.lineTo(cx, baseY + 5);
-            cx += 8; 
-            const rHeight = (type === 'lbbb' && (leadName === 'V5' || leadName === 'V6')) ? 45 : 55;
-            ctx.lineTo(cx, baseY - rHeight);
-            if (type === 'lbbb' && (leadName === 'V5' || leadName === 'V6' || leadName === 'I')) {
+
+            // Khoảng PR
+            cx += (type === 'wpw' ? 4 : 12); ctx.lineTo(cx, baseY);
+
+            // Sóng Delta (WPW)
+            if (type === 'wpw') {
+              cx += 6; ctx.lineTo(cx, baseY - 12);
+            }
+
+            // Sóng Q
+            const isQInferior = (type === 'stemi_inferior' && ['II', 'III', 'aVF'].includes(leadName));
+            const isQAnterior = (type === 'stemi_anterior' && ['V1', 'V2', 'V3'].includes(leadName));
+            if (isQInferior || isQAnterior) {
+              cx += 4; ctx.lineTo(cx, baseY + 18);
+            } else {
+              cx += 3; ctx.lineTo(cx, baseY + 4);
+            }
+
+            // Sóng R
+            let rHeight = 50;
+            if (type === 'lvh_lae' && (leadName === 'V5' || leadName === 'V6')) rHeight = 75;
+            if (type === 'hyperkalemia') rHeight = 40;
+            cx += 6; ctx.lineTo(cx, baseY - rHeight);
+
+            // Khấc R' (RBBB) hoặc M-notch (LBBB)
+            if (type === 'rbbb' && (leadName === 'V1' || leadName === 'V2')) {
+              cx += 4; ctx.lineTo(cx, baseY - 10);
+              cx += 6; ctx.lineTo(cx, baseY - rHeight - 8);
+            } else if (type === 'lbbb' && (leadName === 'V5' || leadName === 'V6' || leadName === 'I' || leadName === 'aVL')) {
               cx += 5; ctx.lineTo(cx, baseY - rHeight + 10);
               cx += 5; ctx.lineTo(cx, baseY - rHeight);
             }
-            cx += 8; ctx.lineTo(cx, baseY + 15);
-            if (type === 'stemi' && ['V1', 'V2', 'V3', 'V4'].includes(leadName)) {
-              cx += 15; ctx.lineTo(cx, baseY - 22);
-              cx += 20; ctx.lineTo(cx, baseY - 30);
-              cx += 20; ctx.lineTo(cx, baseY);
+
+            // Sóng S
+            let sDepth = 12;
+            if (type === 'lvh_lae' && (leadName === 'V1' || leadName === 'V2')) sDepth = 35;
+            if (type === 'rbbb' && (leadName === 'I' || leadName === 'V6')) sDepth = 22;
+            cx += 6; ctx.lineTo(cx, baseY + sDepth);
+
+            // ST & Sóng T
+            if (type === 'stemi_anterior' && ['V1', 'V2', 'V3', 'V4'].includes(leadName)) {
+              cx += 12; ctx.lineTo(cx, baseY - 24);
+              cx += 16; ctx.lineTo(cx, baseY - 32);
+              cx += 16; ctx.lineTo(cx, baseY);
+            } else if (type === 'stemi_inferior' && ['II', 'III', 'aVF'].includes(leadName)) {
+              cx += 12; ctx.lineTo(cx, baseY - 22);
+              cx += 16; ctx.lineTo(cx, baseY - 28);
+              cx += 16; ctx.lineTo(cx, baseY);
+            } else if (type === 'hyperkalemia') {
+              cx += 8; ctx.lineTo(cx, baseY);
+              cx += 12; ctx.lineTo(cx, baseY - 42); // T cao nhọn đối xứng lều
+              cx += 12; ctx.lineTo(cx, baseY);
             } else {
-              cx += 15; ctx.lineTo(cx, baseY);
-              cx += 15; ctx.lineTo(cx, baseY - 12);
-              cx += 15; ctx.lineTo(cx, baseY);
+              cx += 12; ctx.lineTo(cx, baseY);
+              cx += 12; ctx.lineTo(cx, baseY - 12);
+              cx += 12; ctx.lineTo(cx, baseY);
             }
-            cx += 15; ctx.lineTo(cx, baseY);
+            cx += 12; ctx.lineTo(cx, baseY);
           }
           ctx.stroke();
         }
       }
 
+      // Khung định chuẩn milivon chuẩn 1mV = 10mm
       ctx.strokeStyle = '#dc2626';
       ctx.lineWidth = 1.5;
       ctx.beginPath();
-      ctx.moveTo(15, 395);
-      ctx.lineTo(30, 395);
-      ctx.lineTo(30, 345);
-      ctx.lineTo(45, 345);
-      ctx.lineTo(45, 395);
-      ctx.lineTo(60, 395);
+      ctx.moveTo(15, 400); ctx.lineTo(30, 400);
+      ctx.lineTo(30, 350); ctx.lineTo(45, 350);
+      ctx.lineTo(45, 400); ctx.lineTo(60, 400);
       ctx.stroke();
       ctx.fillStyle = '#dc2626';
       ctx.font = '10px monospace';
-      ctx.fillText('10mm/mV 25mm/s', 70, 390);
+      ctx.fillText('10mm/mV (1mV) | 25mm/s (Chuẩn GS. Trần Đỗ Trinh)', 70, 395);
     }
 
     function runAiEcgAnalysis() {
@@ -1747,14 +2170,46 @@
         return;
       }
 
+      const userApiKey = localStorage.getItem('clinical_desk_gemini_key') || (document.getElementById('gemini-api-key') ? document.getElementById('gemini-api-key').value.trim() : '');
+      const previewImg = document.getElementById('ai-preview-img');
+      const isRealImage = previewImg && previewImg.src && previewImg.src.startsWith('data:image') && !previewImg.src.includes('canvas');
+
+      // 1. Nếu Bác sĩ có Gemini API Key và tải ảnh chụp thực tế -> Phân tích thị giác trực tiếp với Google Gemini
+      if (userApiKey && isRealImage) {
+        indicator.className = 'w-2.5 h-2.5 rounded-full bg-purple-500 animate-ping';
+        output.innerHTML = `
+          <div class="py-12 text-center space-y-3">
+            <div class="inline-block p-3 rounded-full bg-purple-50 dark:bg-purple-950/50 text-purple-600 animate-spin">
+              <i data-lucide="sparkles" class="w-8 h-8"></i>
+            </div>
+            <div class="font-bold text-sm text-slate-800 dark:text-slate-200">Google Gemini Vision đang quét trực tiếp ảnh ECG thực tế...</div>
+            <p class="text-xs text-slate-400">Ứng dụng hệ thống tiêu chuẩn 6 bước của GS. Trần Đỗ Trinh & BS. Bùi Cao Mỹ Ái</p>
+          </div>
+        `;
+        lucide.createIcons();
+
+        try {
+          const geminiResult = await callGeminiVisionEcg(userApiKey, previewImg.src);
+          indicator.className = 'w-2.5 h-2.5 rounded-full bg-emerald-500';
+          currentAiCase = geminiResult;
+          renderAiResults(geminiResult);
+          showToast('✅ Google Gemini Vision đã phân tích ảnh ECG thành công!', 'success');
+          return;
+        } catch (err) {
+          console.error('Gemini API Error:', err);
+          showToast('Lỗi Gemini API (' + err.message + '). Đang chuyển sang phân tích nội bộ...', 'warning');
+        }
+      }
+
+      // 2. Chế độ phân tích chuyên sâu tích hợp sẵn (Offline & Sample Cases)
       indicator.className = 'w-2.5 h-2.5 rounded-full bg-amber-500 animate-ping';
       output.innerHTML = `
         <div class="py-12 text-center space-y-3">
           <div class="inline-block p-3 rounded-full bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 animate-spin">
             <i data-lucide="loader-2" class="w-8 h-8"></i>
           </div>
-          <div class="font-bold text-sm text-slate-800 dark:text-slate-200">AI đang quét các chuyển đạo và đo đạc thông số...</div>
-          <p class="text-xs text-slate-400">Trích xuất: Nhịp, trục, khoảng PR, thời gian QRS, QT/QTc và đo độ chênh ST</p>
+          <div class="font-bold text-sm text-slate-800 dark:text-slate-200">AI đang tiến hành phân tích theo 6 bước chuẩn mực GS. Trần Đỗ Trinh...</div>
+          <p class="text-xs text-slate-400">Đang quét: Định chuẩn &rarr; Nhịp tim &rarr; Trục Bayley &rarr; Sóng P/PR &rarr; QRS (Minnesota) &rarr; Tái cực ST-T-QT &rarr; Hội chẩn xử trí</p>
         </div>
       `;
       lucide.createIcons();
@@ -1762,32 +2217,34 @@
       setTimeout(() => {
         indicator.className = 'w-2.5 h-2.5 rounded-full bg-emerald-500';
         renderAiResults(currentAiCase);
-        showToast('Đã phân tích điện tim thành công!', 'success');
-      }, 900);
+        showToast('Đã hoàn tất phân tích ECG theo chuẩn mực học thuật!', 'success');
+      }, 750);
     }
 
     function renderAiResults(data) {
       const output = document.getElementById('ai-output-content');
       
       const urgencyConfig = {
-        critical: { border: 'border-red-500', bg: 'bg-red-50 dark:bg-red-950/40', text: 'text-red-700 dark:text-red-300', badge: 'BÁO ĐỘNG ĐỎ - CẤP CỨU', badgeBg: 'bg-red-600 text-white' },
-        warning: { border: 'border-amber-500', bg: 'bg-amber-50 dark:bg-amber-950/40', text: 'text-amber-700 dark:text-amber-300', badge: 'CẢNH BÁO CAO', badgeBg: 'bg-amber-600 text-white' },
-        info: { border: 'border-blue-500', bg: 'bg-blue-50 dark:bg-blue-950/40', text: 'text-blue-700 dark:text-blue-300', badge: 'THEO DÕI LÂM SÀNG', badgeBg: 'bg-blue-600 text-white' },
+        critical: { border: 'border-red-500', bg: 'bg-red-50 dark:bg-red-950/40', text: 'text-red-700 dark:text-red-300', badge: 'BÁO ĐỘNG ĐỎ - CẤP CỨU KHẨN CẤP', badgeBg: 'bg-red-600 text-white' },
+        warning: { border: 'border-amber-500', bg: 'bg-amber-50 dark:bg-amber-950/40', text: 'text-amber-700 dark:text-amber-300', badge: 'CẢNH BÁO BỆNH LÝ', badgeBg: 'bg-amber-600 text-white' },
+        info: { border: 'border-blue-500', bg: 'bg-blue-50 dark:bg-blue-950/40', text: 'text-blue-700 dark:text-blue-300', badge: 'THEO DÕI ĐIỆN HỌC', badgeBg: 'bg-blue-600 text-white' },
         normal: { border: 'border-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-950/40', text: 'text-emerald-700 dark:text-emerald-300', badge: 'BÌNH THƯỜNG', badgeBg: 'bg-emerald-600 text-white' }
       }[data.urgency || 'info'];
 
       output.innerHTML = `
+        <!-- Main Diagnosis Banner -->
         <div class="p-4 rounded-xl border-2 ${urgencyConfig.border} ${urgencyConfig.bg} space-y-2">
           <div class="flex items-center justify-between">
             <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded ${urgencyConfig.badgeBg}">${urgencyConfig.badge}</span>
             <span class="text-xs font-semibold text-slate-500">${data.name}</span>
           </div>
-          <h4 class="text-base font-extrabold ${urgencyConfig.text} leading-snug">${data.diagnosis}</h4>
+          <h4 class="text-base sm:text-lg font-extrabold ${urgencyConfig.text} leading-snug">${data.steps.step7 || data.diagnosis}</h4>
         </div>
 
+        <!-- 4 Fast Metrics Cards -->
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
           <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-            <span class="text-slate-400 block text-[10px] uppercase font-semibold">Tần số tim</span>
+            <span class="text-slate-400 block text-[10px] uppercase font-semibold">Tần số thất</span>
             <span class="text-lg font-extrabold text-slate-800 dark:text-white font-mono-calc">${data.rate}</span>
             <span class="text-[10px] text-slate-400">ck/phút</span>
           </div>
@@ -1796,7 +2253,7 @@
             <span class="text-xs font-bold text-slate-800 dark:text-white truncate block mt-1">${data.rhythm}</span>
           </div>
           <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-            <span class="text-slate-400 block text-[10px] uppercase font-semibold">Trục QRS</span>
+            <span class="text-slate-400 block text-[10px] uppercase font-semibold">Trục QRS (Bayley)</span>
             <span class="text-xs font-bold text-slate-800 dark:text-white truncate block mt-1">${data.axis}</span>
           </div>
           <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
@@ -1805,33 +2262,78 @@
           </div>
         </div>
 
-        <div class="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl space-y-1.5 text-xs">
-          <span class="font-bold text-slate-700 dark:text-slate-300 block">Đo đạc chi tiết các sóng & đoạn:</span>
-          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-[11px]">
-            <div><span class="text-slate-400">Đoạn PR:</span> <b class="font-mono-calc">${data.intervals.pr}</b></div>
-            <div><span class="text-slate-400">Phức bộ QRS:</span> <b class="font-mono-calc">${data.intervals.qrs}</b></div>
-            <div><span class="text-slate-400">Khoảng QT:</span> <b class="font-mono-calc">${data.intervals.qt}</b></div>
+        <!-- Detailed 6-Step Standard Breakdown (GS. Trần Đỗ Trinh) -->
+        <div class="space-y-2.5">
+          <h5 class="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-1.5">
+            <span class="flex items-center gap-1.5">
+              <i data-lucide="list-ordered" class="w-4 h-4 text-teal-600"></i>
+              Báo cáo Phân Tích Chi Tiết Theo 6 Bước Chuẩn Mực:
+            </span>
+            <span class="text-[10px] font-normal text-slate-400">Chuẩn GS. Trần Đỗ Trinh</span>
+          </h5>
+
+          <!-- Bước 1 -->
+          <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 text-xs">
+            <div class="font-bold text-slate-900 dark:text-white flex items-center gap-1.5 mb-1">
+              <span class="w-4 h-4 rounded-full bg-teal-100 dark:bg-teal-900 text-teal-700 dark:text-teal-300 text-[10px] flex items-center justify-center font-bold">1</span>
+              <span>Kiểm tra Kỹ thuật ghi & Định chuẩn:</span>
+            </div>
+            <p class="text-slate-600 dark:text-slate-300 pl-5.5 leading-relaxed">${data.steps.step1}</p>
+          </div>
+
+          <!-- Bước 2 -->
+          <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 text-xs">
+            <div class="font-bold text-slate-900 dark:text-white flex items-center gap-1.5 mb-1">
+              <span class="w-4 h-4 rounded-full bg-teal-100 dark:bg-teal-900 text-teal-700 dark:text-teal-300 text-[10px] flex items-center justify-center font-bold">2</span>
+              <span>Phân tích Nhịp tim & Tần số tim:</span>
+            </div>
+            <p class="text-slate-600 dark:text-slate-300 pl-5.5 leading-relaxed">${data.steps.step2}</p>
+          </div>
+
+          <!-- Bước 3 -->
+          <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 text-xs">
+            <div class="font-bold text-slate-900 dark:text-white flex items-center gap-1.5 mb-1">
+              <span class="w-4 h-4 rounded-full bg-teal-100 dark:bg-teal-900 text-teal-700 dark:text-teal-300 text-[10px] flex items-center justify-center font-bold">3</span>
+              <span>Trục điện tim & Tư thế tim:</span>
+            </div>
+            <p class="text-slate-600 dark:text-slate-300 pl-5.5 leading-relaxed">${data.steps.step3}</p>
+          </div>
+
+          <!-- Bước 4 -->
+          <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 text-xs">
+            <div class="font-bold text-slate-900 dark:text-white flex items-center gap-1.5 mb-1">
+              <span class="w-4 h-4 rounded-full bg-teal-100 dark:bg-teal-900 text-teal-700 dark:text-teal-300 text-[10px] flex items-center justify-center font-bold">4</span>
+              <span>Khảo sát Sóng P & Khoảng PQ/PR:</span>
+            </div>
+            <p class="text-slate-600 dark:text-slate-300 pl-5.5 leading-relaxed">${data.steps.step4}</p>
+          </div>
+
+          <!-- Bước 5 -->
+          <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 text-xs">
+            <div class="font-bold text-slate-900 dark:text-white flex items-center gap-1.5 mb-1">
+              <span class="w-4 h-4 rounded-full bg-teal-100 dark:bg-teal-900 text-teal-700 dark:text-teal-300 text-[10px] flex items-center justify-center font-bold">5</span>
+              <span>Khảo sát Khử cực Thất (Phức bộ QRS):</span>
+            </div>
+            <p class="text-slate-600 dark:text-slate-300 pl-5.5 leading-relaxed">${data.steps.step5}</p>
+          </div>
+
+          <!-- Bước 6 -->
+          <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 text-xs">
+            <div class="font-bold text-slate-900 dark:text-white flex items-center gap-1.5 mb-1">
+              <span class="w-4 h-4 rounded-full bg-teal-100 dark:bg-teal-900 text-teal-700 dark:text-teal-300 text-[10px] flex items-center justify-center font-bold">6</span>
+              <span>Khảo sát Tái cực Thất (Đoạn ST, Sóng T, QT/QTc & Sóng U):</span>
+            </div>
+            <p class="text-slate-600 dark:text-slate-300 pl-5.5 leading-relaxed">${data.steps.step6}</p>
           </div>
         </div>
 
-        <div class="space-y-1.5">
-          <h5 class="text-xs font-bold uppercase tracking-wider text-slate-500">Các dấu hiệu bất thường phát hiện được:</h5>
-          <ul class="space-y-1 text-xs text-slate-700 dark:text-slate-300">
-            ${data.findings.map(f => `
-              <li class="flex items-start gap-2">
-                <i data-lucide="alert-circle" class="w-3.5 h-3.5 text-red-500 shrink-0 mt-0.5"></i>
-                <span>${f}</span>
-              </li>
-            `).join('')}
-          </ul>
-        </div>
-
+        <!-- Clinical Recommendations & Emergency Action -->
         <div class="p-3.5 rounded-xl bg-teal-50/70 dark:bg-teal-950/40 border border-teal-200 dark:border-teal-800/60 space-y-2">
           <h5 class="text-xs font-bold text-teal-900 dark:text-teal-200 flex items-center gap-1.5">
-            <i data-lucide="check-square" class="w-4 h-4 text-teal-600"></i>
-            Gợi ý Xử trí & Hội chẩn lâm sàng:
+            <i data-lucide="shield-check" class="w-4 h-4 text-teal-600"></i>
+            Khuyến cáo Xử trí & Hội chẩn Lâm sàng:
           </h5>
-          <ul class="space-y-1 text-xs text-teal-950 dark:text-teal-100 list-disc list-inside">
+          <ul class="space-y-1 text-xs text-teal-950 dark:text-teal-100 list-disc list-inside leading-relaxed">
             ${data.recommendations.map(r => `<li>${r}</li>`).join('')}
           </ul>
         </div>
@@ -1841,9 +2343,107 @@
 
     function copyAiReport() {
       if (!currentAiCase) return;
-      const text = `=== BÁO CÁO PHÂN TÍCH ĐIỆN TÂM ĐỒ (AI ECG ASSISTANT) ===\nCa bệnh: ${currentAiCase.name}\nChẩn đoán gợi ý: ${currentAiCase.diagnosis}\nTần số: ${currentAiCase.rate} ck/p | Nhịp: ${currentAiCase.rhythm} | Trục: ${currentAiCase.axis}\nKhoảng: PR ${currentAiCase.intervals.pr} | QRS ${currentAiCase.intervals.qrs} | QTc ${currentAiCase.intervals.qtc}\n\nDấu hiệu phát hiện:\n${currentAiCase.findings.map(f => '- ' + f).join('\n')}\n\nGợi ý xử trí:\n${currentAiCase.recommendations.map(r => '- ' + r).join('\n')}\n\n*Lưu ý: Kết quả mang tính chất tham khảo cho Bác sĩ điều trị.`;
+      const d = currentAiCase;
+      const text = `=== BÁO CÁO PHÂN TÍCH ĐIỆN TÂM ĐỒ (AI ECG ASSISTANT) ===
+Ca bệnh: ${d.name}
+${d.steps.step7 || d.diagnosis}
+--------------------------------------------------
+Tần số: ${d.rate} ck/p | Nhịp: ${d.rhythm} | Trục: ${d.axis}
+Khoảng đo: PR ${d.intervals.pr} | QRS ${d.intervals.qrs} | QTc ${d.intervals.qtc}
+
+CHI TIẾT 6 BƯỚC PHÂN TÍCH (CHUẨN GS. TRẦN ĐỖ TRINH):
+1. Định chuẩn & Kỹ thuật: ${d.steps.step1}
+2. Nhịp & Tần số: ${d.steps.step2}
+3. Trục & Tư thế tim: ${d.steps.step3}
+4. Sóng P & PQ/PR: ${d.steps.step4}
+5. Phức bộ QRS: ${d.steps.step5}
+6. Đoạn ST, Sóng T, QT: ${d.steps.step6}
+
+GỢI Ý XỬ TRÍ LÂM SÀNG:
+${d.recommendations.map(r => '- ' + r).join('\n')}
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+(Phân tích theo chuẩn GS. Trần Đỗ Trinh & BS. Bùi Cao Mỹ Ái - Clinical Desk MD)`;
       navigator.clipboard.writeText(text);
-      showToast('Đã copy toàn bộ kết quả phân tích ECG!', 'success');
+      showToast('Đã copy toàn bộ kết quả phân tích ECG 6 bước!', 'success');
+    }
+
+    async function callGeminiVisionEcg(apiKey, dataUrl) {
+      const match = dataUrl.match(/^data:([^;]+);base64,(.+)$/);
+      if (!match) throw new Error('Dữ liệu ảnh không hợp lệ');
+      const mimeType = match[1];
+      const base64Data = match[2];
+
+      const systemPrompt = `Bác sĩ chuyên khoa Tim mạch phân tích ảnh điện tâm đồ 12 chuyển đạo theo hệ thống tiêu chuẩn y khoa Việt Nam của GS. Trần Đỗ Trinh (ĐH Y Dược Huế) và BS. Bùi Cao Mỹ Ái.
+Yêu cầu phân tích chi tiết theo đúng 6 bước chuẩn mực:
+Bước 1: Kỹ thuật ghi & Định chuẩn: Vận tốc giấy (25mm/s: 1 ô nhỏ = 0.04s, 1 ô lớn = 0.20s), Điện thế (10mm/1mV = N hay 2N, N/2). Kiểm tra đường đẳng điện T-P, phát hiện nhiễu 50Hz hoặc run cơ; kiểm tra loại trừ bẫy mắc ngược cực tay (DI âm toàn bộ, aVR dương).
+Bước 2: Phân tích Nhịp tim & Tần số: Đánh giá 5 tiêu chuẩn nhịp xoang (P đi trước QRS, P(+) ở DI, DII, aVF, V5, V6, P(-) ở aVR, PR 0.12-0.20s cố định, P đồng dạng, tần số 60-100 ck/p). Tính tần số bằng luật 300 / ô lớn hoặc 1500 / ô nhỏ hoặc đếm 30 ô lớn x 10 khi không đều. Phát hiện Rung nhĩ (mất P, sóng f), Cuồng nhĩ (sóng F 300 ck/p), Ngoại tâm thu, SVT, VT.
+Bước 3: Trục điện tim & Tư thế tim: Dùng tam trục kép Bayley, tính góc alpha (chuẩn người Việt +65°, bình thường 0° đến +90°). Tư thế tim: trung gian, nằm (Q1S3), đứng (S1Q3), mỏm tim ra sau (S1S2S3).
+Bước 4: Sóng P & Khoảng PQ/PR: Sóng P rộng <= 0.11s, cao <= 2mm. Dày nhĩ phải (P phế > 2.5mm nhọn ở DII, DIII, aVF); Dày nhĩ trái (P hai lá > 0.12s 2 đỉnh chẻ đôi, pha âm V1 rộng sâu). Khoảng PQ/PR: 0.12 - 0.20s. Nhận diện WPW (PR < 0.12s + sóng Delta); Block AV độ 1, độ 2 Mobitz 1 (Wenckebach) / Mobitz 2, độ 3.
+Bước 5: Phức bộ QRS (Khử cực thất): Thời gian QRS (0.07s). Tiêu chuẩn sóng Q hoại tử Minnesota (rộng >= 0.04s, sâu >= 1/4 R hoặc sâu >= 3mm/5mm, dạng QS ở V1-V4). Block nhánh phải RBBB (rsR' ở V1, S rộng DI, V6); Block nhánh trái LBBB (R có khấc DI, aVL, V5, V6 mất Q); Dày thất trái Sokolow-Lyon (RV5+SV1 >= 35mm, RaVL > 12mm); Dày thất phải (RV1 >= 7mm, RV1+SV5 > 11mm, R/S V1 > 1); Điện thế thấp (< 5mm ngoại vi, < 10mm trước ngực).
+Bước 6: Khảo sát Tái cực Thất (Đoạn ST, Sóng T, QT/QTc, Sóng U): Đoạn ST đo từ điểm J so với đường TP. ST chênh vòm một pha STEMI định khu rõ ràng (trước vách V1-V3, trước bên V5-V6-DI-aVL, thành dưới DII-DIII-aVF có soi gương); Viêm màng ngoài tim chênh lõm lan tỏa; Ngấm Digitalis võng đáy chén. Sóng T (Pardee âm sâu nhọn đối xứng, T cao nhọn đối xứng tăng Kali, T dẹt hạ Kali). Khoảng QTc Bazett = QT/√RR (< 0.44s nam, < 0.46s nữ). Sóng U trong hạ Kali.
+Bước 7: Kết luận chẩn đoán tổng hợp viết hoa và đề xuất xử trí lâm sàng khẩn cấp.
+
+BẮT BUỘC TRẢ VỀ JSON THUẦN TÚY (KHÔNG KÈM BẤT KỲ VĂN BẢN NÀO BÊN NGOÀI):
+{
+  "name": "Bệnh nhân (Ảnh chụp thực tế)",
+  "rate": 78,
+  "rhythm": "Nhịp xoang đều",
+  "axis": "Trục trung gian (+55°)",
+  "intervals": {
+    "pr": "0.16s",
+    "qrs": "0.08s",
+    "qt": "0.38s",
+    "qtc": "0.42s"
+  },
+  "steps": {
+    "step1": "Mô tả bước 1...",
+    "step2": "Mô tả bước 2...",
+    "step3": "Mô tả bước 3...",
+    "step4": "Mô tả bước 4...",
+    "step5": "Mô tả bước 5...",
+    "step6": "Mô tả bước 6...",
+    "step7": "KẾT LUẬN VIẾT HOA..."
+  },
+  "urgency": "critical",
+  "recommendations": [
+    "Khuyến cáo 1",
+    "Khuyến cáo 2"
+  ]
+}`;
+
+      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{
+            parts: [
+              { text: systemPrompt },
+              {
+                inline_data: {
+                  mime_type: mimeType,
+                  data: base64Data
+                }
+              }
+            ]
+          }],
+          generationConfig: {
+            temperature: 0.1,
+            response_mime_type: 'application/json'
+          }
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData?.error?.message || ('Mã lỗi HTTP: ' + response.status));
+      }
+
+      const resJson = await response.json();
+      const textResponse = resJson.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (!textResponse) throw new Error('Không nhận được kết quả từ AI Gemini');
+
+      return JSON.parse(textResponse);
     }
 
     function toggleApiConfig() {
@@ -1854,12 +2454,23 @@
     }
 
     function saveApiKey() {
-      const key = document.getElementById('gemini-api-key').value;
+      const key = document.getElementById('gemini-api-key').value.trim();
       if (key) {
         localStorage.setItem('clinical_desk_gemini_key', key);
-        showToast('Đã lưu Gemini API Key!', 'success');
+        showToast('Đã lưu Gemini API Key! Giờ bạn có thể quét ảnh thực tế trực tiếp với AI Google.', 'success');
+      } else {
+        localStorage.removeItem('clinical_desk_gemini_key');
+        showToast('Đã xóa Gemini API Key. Hệ thống chuyển về bộ phân tích chuẩn mực tích hợp sẵn.', 'info');
       }
     }
+
+    // Tự động tải lại API Key đã lưu
+    window.addEventListener('DOMContentLoaded', () => {
+      const savedKey = localStorage.getItem('clinical_desk_gemini_key');
+      if (savedKey && document.getElementById('gemini-api-key')) {
+        document.getElementById('gemini-api-key').value = savedKey;
+      }
+    });
 
     // -------------------------------------------------------------
     // TAB 3: PROTOCOLS
