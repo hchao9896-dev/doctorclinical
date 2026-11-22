@@ -636,61 +636,69 @@
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
           <!-- Form Input -->
           <div class="lg:col-span-6 bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-800 space-y-4 text-xs">
-            <h3 class="font-bold text-slate-800 dark:text-slate-200 border-b border-slate-100 dark:border-slate-800 pb-2">
-              Nhập Số Liệu Ca Trực
+            <h3 class="font-bold text-slate-800 dark:text-slate-200 border-b border-slate-100 dark:border-slate-800 pb-2 flex items-center justify-between">
+              <span>BÁO CÁO GIAO BAN TRỰC NGOẠI</span>
+              <span class="text-[11px] font-normal text-teal-600 dark:text-teal-400">Chuẩn Ngoại khoa</span>
             </h3>
 
+            <!-- Ngày trực & Tua trực -->
             <div class="grid grid-cols-2 gap-3">
               <div>
-                <label class="block font-semibold text-slate-600 dark:text-slate-400 mb-1">Ngày trực</label>
-                <input type="date" id="brief-date" class="w-full px-2.5 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs">
+                <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Ngày trực:</label>
+                <input type="date" id="brief-date" oninput="updateBriefingPreview()" class="w-full px-2.5 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs font-medium">
               </div>
               <div>
-                <label class="block font-semibold text-slate-600 dark:text-slate-400 mb-1">Kíp trực</label>
-                <input type="text" id="brief-team" value="BS. Trực chính + ĐD. Trực" class="w-full px-2.5 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs">
+                <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Tua trực:</label>
+                <input type="text" id="brief-team" value="BS. Trưởng tua + Kíp trực" oninput="updateBriefingPreview()" class="w-full px-2.5 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs font-medium">
               </div>
             </div>
 
-            <!-- Stats Grid -->
-            <div class="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl space-y-2">
-              <span class="font-bold text-slate-700 dark:text-slate-300 block">Thống kê số lượng:</span>
-              <div class="grid grid-cols-3 gap-2">
-                <div>
-                  <span class="text-[11px] text-slate-500">Tổng số BN:</span>
-                  <input type="number" id="brief-total" value="45" oninput="updateBriefingPreview()" class="w-full mt-1 px-2 py-1.5 rounded border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-bold">
-                </div>
-                <div>
-                  <span class="text-[11px] text-slate-500">Vào viện mới:</span>
-                  <input type="number" id="brief-admissions" value="8" oninput="updateBriefingPreview()" class="w-full mt-1 px-2 py-1.5 rounded border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-bold text-emerald-600">
-                </div>
-                <div>
-                  <span class="text-[11px] text-slate-500">Ra viện / Chuyển:</span>
-                  <input type="number" id="brief-discharges" value="5" oninput="updateBriefingPreview()" class="w-full mt-1 px-2 py-1.5 rounded border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-bold text-blue-600">
-                </div>
-                <div>
-                  <span class="text-[11px] text-slate-500">Mổ cấp cứu:</span>
-                  <input type="number" id="brief-emerg-surgeries" value="2" oninput="updateBriefingPreview()" class="w-full mt-1 px-2 py-1.5 rounded border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-bold text-amber-600">
-                </div>
-                <div>
-                  <span class="text-[11px] text-slate-500">Mổ phiên:</span>
-                  <input type="number" id="brief-sched-surgeries" value="6" oninput="updateBriefingPreview()" class="w-full mt-1 px-2 py-1.5 rounded border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-bold">
-                </div>
-                <div>
-                  <span class="text-[11px] text-slate-500">Tử vong:</span>
-                  <input type="number" id="brief-deaths" value="0" oninput="updateBriefingPreview()" class="w-full mt-1 px-2 py-1.5 rounded border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-bold text-red-600">
-                </div>
+            <!-- MỤC I: TỔNG SỐ CA MỔ TRONG NGÀY -->
+            <div class="p-3.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl space-y-2.5 border border-slate-200 dark:border-slate-700/60">
+              <span class="font-bold text-slate-800 dark:text-slate-200 text-xs uppercase tracking-wide flex items-center gap-1.5 text-teal-700 dark:text-teal-400">
+                <i data-lucide="scissors" class="w-4 h-4"></i>
+                I. TỔNG SỐ CA MỔ TRONG NGÀY:
+              </span>
+              <div>
+                <label class="block font-semibold text-slate-600 dark:text-slate-400 mb-0.5">1. Khoa Ngoại CTCH:</label>
+                <input type="text" id="brief-surg-ctch" placeholder="VD: 02 ca (01 KHX đùi, 01 nẹp vis bánh chè)" value="0 ca" oninput="updateBriefingPreview()" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-medium">
+              </div>
+              <div>
+                <label class="block font-semibold text-slate-600 dark:text-slate-400 mb-0.5">2. Khoa Ngoại TH:</label>
+                <input type="text" id="brief-surg-th" placeholder="VD: 03 ca (02 VRTC nội soi, 01 thủng dạ dày)" value="0 ca" oninput="updateBriefingPreview()" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-medium">
               </div>
             </div>
 
-            <!-- Heavy Patients & Incident Details -->
-            <div>
-              <label class="block font-semibold text-slate-600 dark:text-slate-400 mb-1">Danh sách BN nặng / Cần xin ý kiến giao ban:</label>
-              <textarea id="brief-heavy-patients" rows="4" oninput="updateBriefingPreview()" class="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs" placeholder="1. BN Trần Văn B (62t) - Giường 12: Hậu phẫu cắt túi mật N1, dẫn lưu ra 50ml dịch hồng, mạch 85, SpO2 98%...&#10;2. BN Lê Thị C (75t) - Giường 04: Viêm phổi nặng / ĐTĐ typ 2, sốt 38.8C..."></textarea>
+            <!-- MỤC II: CHUYỂN VIỆN -->
+            <div class="p-3.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl space-y-2.5 border border-slate-200 dark:border-slate-700/60">
+              <span class="font-bold text-slate-800 dark:text-slate-200 text-xs uppercase tracking-wide flex items-center gap-1.5 text-blue-700 dark:text-blue-400">
+                <i data-lucide="ambulance" class="w-4 h-4"></i>
+                II. Chuyển viện:
+              </span>
+              <div>
+                <label class="block font-semibold text-slate-600 dark:text-slate-400 mb-0.5">1. Khoa Cấp cứu:</label>
+                <input type="text" id="brief-trans-cc" placeholder="VD: 01 ca (Chấn thương sọ não nặng -> Chợ Rẫy)" value="0 ca" oninput="updateBriefingPreview()" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-medium">
+              </div>
+              <div>
+                <label class="block font-semibold text-slate-600 dark:text-slate-400 mb-0.5">2. Khoa Ngoại CTCH:</label>
+                <input type="text" id="brief-trans-ctch" placeholder="VD: 0 ca" value="0 ca" oninput="updateBriefingPreview()" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-medium">
+              </div>
+              <div>
+                <label class="block font-semibold text-slate-600 dark:text-slate-400 mb-0.5">3. Khoa Ngoại TH:</label>
+                <input type="text" id="brief-trans-th" placeholder="VD: 0 ca" value="0 ca" oninput="updateBriefingPreview()" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-medium">
+              </div>
             </div>
 
+            <!-- MỤC III: BỆNH NHÂN NẶNG -->
             <div>
-              <label class="block font-semibold text-slate-600 dark:text-slate-400 mb-1">Vấn đề hành chính / Trang thiết bị hỏng / Sự cố:</label>
-              <textarea id="brief-incidents" rows="2" oninput="updateBriefingPreview()" class="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs" placeholder="Máy hút đờm phòng 302 hoạt động chập chờn, đã báo phòng Vật tư sửa chữa..."></textarea>
+              <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">III. Bệnh nhân nặng / Cần theo dõi hoặc xin ý kiến:</label>
+              <textarea id="brief-heavy-patients" rows="3" oninput="updateBriefingPreview()" class="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs" placeholder="- BN Nguyễn Văn A (62t) - Giường 12: Hậu phẫu cắt túi mật N1, theo dõi dịch dẫn lưu...&#10;- BN Trần Thị B (70t) - Giường 05: Sốc đa chấn thương..."></textarea>
+            </div>
+
+            <!-- MỤC IV: TRANG THIẾT BỊ / SỰ CỐ -->
+            <div>
+              <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">IV. Tình hình trang thiết bị / Sự cố (nếu có):</label>
+              <textarea id="brief-incidents" rows="2" oninput="updateBriefingPreview()" class="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs" placeholder="Ca trực an toàn, máy thở và dàn phẫu thuật nội soi hoạt động bình thường..."></textarea>
             </div>
           </div>
 
@@ -2350,40 +2358,51 @@
       updateBriefingPreview();
     }
 
+    function formatDateVietnamese(dateStr) {
+      if (!dateStr) return '';
+      const parts = dateStr.split('-');
+      if (parts.length === 3) {
+        return `${parts[2]}/${parts[1]}/${parts[0]}`;
+      }
+      return dateStr;
+    }
+
     function updateBriefingPreview() {
-      const date = document.getElementById('brief-date').value || 'Hôm nay';
-      const team = document.getElementById('brief-team').value;
-      const total = document.getElementById('brief-total').value || 0;
-      const adm = document.getElementById('brief-admissions').value || 0;
-      const dis = document.getElementById('brief-discharges').value || 0;
-      const emergSurg = document.getElementById('brief-emerg-surgeries').value || 0;
-      const schedSurg = document.getElementById('brief-sched-surgeries').value || 0;
-      const deaths = document.getElementById('brief-deaths').value || 0;
-      const heavy = document.getElementById('brief-heavy-patients').value;
-      const incidents = document.getElementById('brief-incidents').value;
+      const rawDate = document.getElementById('brief-date')?.value || '';
+      const dateFormatted = formatDateVietnamese(rawDate) || '...';
+      const team = document.getElementById('brief-team')?.value || '...';
+      const surgCtch = document.getElementById('brief-surg-ctch')?.value || '0 ca';
+      const surgTh = document.getElementById('brief-surg-th')?.value || '0 ca';
+      const transCc = document.getElementById('brief-trans-cc')?.value || '0 ca';
+      const transCtch = document.getElementById('brief-trans-ctch')?.value || '0 ca';
+      const transTh = document.getElementById('brief-trans-th')?.value || '0 ca';
+      const heavy = document.getElementById('brief-heavy-patients')?.value || '';
+      const incidents = document.getElementById('brief-incidents')?.value || '';
 
-      const preview = `📋 BÁO CÁO GIAO BAN CA TRỰC KHOA
+      const preview = `BÁO CÁO GIAO BAN TRỰC NGOẠI NGÀY ${dateFormatted}
+TUA TRỰC: ${team}
+
+I. TỔNG SỐ CA MỔ TRONG NGÀY:
+1. Khoa Ngoại CTCH: ${surgCtch}
+2. Khoa Ngoại TH: ${surgTh}
+
+II. Chuyển viện:
+1. Khoa cấp cứu: ${transCc}
+2. Khoa Ngoại CTCH: ${transCtch}
+3. Khoa Ngoại TH: ${transTh}
+
+III. Bệnh nhân nặng / Cần theo dõi hoặc xin ý kiến:
+${heavy ? heavy : '- Không có ca nặng diễn biến bất thường.'}
+
+IV. Tình hình trang thiết bị / Sự cố:
+${incidents ? incidents : '- Ca trực an toàn, trang thiết bị hoạt động ổn định.'}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
-📅 Ngày trực: ${date}
-👨‍⚕️ Kíp trực: ${team}
+(Báo cáo xuất từ Clinical Desk MD)`;
 
-📊 SỐ LIỆU TỔNG HỢP:
-• Tổng số bệnh nhân hiện tại: ${total} BN
-• Tiếp nhận vào viện mới: ${adm} BN
-• Ra viện / Chuyển viện: ${dis} BN
-• Phẫu thuật cấp cứu trong trực: ${emergSurg} ca
-• Phẫu thuật phiên: ${schedSurg} ca
-• Ca tử vong / Tiên lượng nặng xin về: ${deaths} ca
-
-🚨 DANH SÁCH BỆNH NHÂN NẶNG / XIN Ý KIẾN:
-${heavy ? heavy : '(Không có ca nặng phát sinh ngoài dự kiến)'}
-
-⚙️ TÌNH HÌNH TRANG THIẾT BỊ / SỰ CỐ:
-${incidents ? incidents : 'Ca trực an toàn, trang thiết bị hoạt động ổn định.'}
-━━━━━━━━━━━━━━━━━━━━━━━━━━
-(Báo cáo được xuất từ Clinical Desk MD)`;
-
-      document.getElementById('briefing-preview-text').innerText = preview;
+      const previewEl = document.getElementById('briefing-preview-text');
+      if (previewEl) {
+        previewEl.innerText = preview;
+      }
     }
 
     function copyBriefingText() {
