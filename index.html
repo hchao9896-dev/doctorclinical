@@ -1003,7 +1003,7 @@
     // SUPABASE REALTIME CLOUD INTEGRATION
     // -------------------------------------------------------------
     const SUPABASE_URL = 'https://auiafllkiupoiqbsdhpv.supabase.co';
-    const SUPABASE_KEY = 'sb_publishable_HZm5VypoTOWj6LJKJUBiaQ_4uKpkJ_R';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF1aWFmbGxraXVwb2lxYnNkaHB2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTUxODMyNjksImV4cCI6MjExMDc1OTI2OX0.h6LhVHMSzqmvbJ4Wz6ClRxZZf5v733lOGV4sLT69l2M';
     let supabaseClient = null;
 
     try {
@@ -1108,7 +1108,7 @@
 
         if (error) {
           console.warn('Supabase notice:', error.message);
-          updateCloudSyncBadge('Đám mây: Cần chạy lệnh SQL bảng', 'warning');
+          updateCloudSyncBadge('Đám mây: ' + (error.message || 'Lỗi kết nối'), 'warning');
           return;
         }
 
