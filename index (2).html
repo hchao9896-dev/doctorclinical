@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Clinical Desk - Bác sĩ Workspace</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Supabase JS Client for Realtime Cloud Sync -->
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0fdfa',
+              100: '#ccfbf1',
+              500: '#14b8a6',
+              600: '#0d9488',
+              700: '#0f766e',
+              800: '#115e59',
+              900: '#134e4a',
+            },
+            clinical: {
+              bg: '#f8fafc',
+              darkbg: '#0b1120',
+              card: '#ffffff',
+              darkcard: '#1e293b',
+              navy: '#0f172a'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="./css/styles.css">
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col transition-colors duration-200">
+
+  <!-- TOP APP BAR -->
+  <header class="no-print sticky top-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 py-2.5 flex items-center justify-between shadow-xs">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-teal-600 to-cyan-500 flex items-center justify-center text-white shadow-md shadow-teal-500/20">
+        <i data-lucide="activity" class="w-6 h-6"></i>
+      </div>
+      <div>
+        <div class="flex items-center gap-2">
+          <h1 class="text-lg font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-1.5">
+            CLINICAL DESK
+            <span class="text-[10px] uppercase font-semibold px-1.5 py-0.5 rounded-full bg-teal-100 dark:bg-teal-900/50 text-teal-800 dark:text-teal-300">MD Pro</span>
+          </h1>
+        </div>
+        <p class="text-xs text-slate-500 dark:text-slate-400">Sổ tay lâm sàng & Trợ lý bác sĩ trực</p>
+      </div>
+    </div>
+
+    <!-- Right Controls -->
+    <div class="flex items-center gap-2">
+      <!-- Sync Status Badge -->
+      <div class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-xs text-emerald-700 dark:text-emerald-300">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span id="storage-status-text">Đồng bộ sẵn sàng</span>
+      </div>
+
+      <button id="auth-open-btn" type="button" onclick="openAuthModal()" class="no-print flex items-center gap-1.5 px-2.5 py-2 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+        <i data-lucide="user-round" class="w-4 h-4"></i><span id="auth-button-label">Đăng nhập</span>
+      </button>
+
+      <!-- Dark Mode Toggle -->
+      <button id="theme-toggle" class="p-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition" title="Đổi chế độ sáng/tối trực đêm">
+        <i data-lucide="moon" class="w-5 h-5 hidden dark:block"></i>
+        <i data-lucide="sun" class="w-5 h-5 block dark:hidden"></i>
+      </button>
+
+      <!-- Quick Action: Upload button on desktop header -->
+      <button onclick="document.getElementById('ecg-gallery-input').click()" class="hidden md:flex items-center gap-1.5 px-3 py-1.5 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-xs font-semibold cursor-pointer shadow-sm transition active:scale-95">
+        <i data-lucide="image" class="w-4 h-4"></i>
+        <span>Tải ảnh ECG</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <div class="flex-1 flex max-w-7xl w-full mx-auto pb-16 md:pb-6">
+    
+    <!-- DESKTOP SIDEBAR NAVIGATION -->
+    <aside class="no-print hidden md:block w-64 border-r border-slate-200 dark:border-slate-800 p-4 shrink-0 bg-white dark:bg-slate-900/50">
+      <div class="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-3 px-3">
+        Phân hệ làm việc
+      </div>
+      <nav class="space-y-1" id="desktop-nav">
+        <!-- Buttons injected dynamically -->
+      </nav>
+
+      <!-- Auto-purge notice box -->
+      <div class="mt-8 p-3 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60 text-xs text-amber-800 dark:text-amber-300">
+        <div class="flex items-center gap-1.5 font-semibold mb-1">
+          <i data-lucide="clock" class="w-4 h-4 text-amber-600 dark:text-amber-400"></i>
+          <span>Lưu trữ ảnh trên Cloud</span>
+        </div>
+        <p class="text-[11px] text-amber-700/80 dark:text-amber-300/80 leading-relaxed">
+          Ảnh nằm trong Supabase Storage riêng tư; trình duyệt chỉ lưu metadata. Ảnh không ghim tự động xóa sau 30 ngày.
+        </p>
+      </div>
+
+      <!-- Quick Doctor Signature or Hospital Dept -->
+      <div class="mt-4 p-3 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs">
+        <div class="flex items-center justify-between gap-2 mb-2">
+          <span class="text-slate-500 dark:text-slate-400 font-medium">Tài khoản / phân quyền:</span>
+          <span id="auth-state-label" class="text-[10px] text-amber-600 dark:text-amber-400">Chưa đăng nhập</span>
+        </div>
+        <p id="auth-state-detail" class="text-[10px] text-slate-400 mb-2">Đăng nhập để đồng bộ ECG và phân quyền theo bác sĩ/kíp khoa.</p>
+        <div class="text-slate-500 dark:text-slate-400 font-medium">Bác sĩ phụ trách:</div>
+        <input type="text" id="doctor-name-input" placeholder="BS. Nguyễn Văn A" class="mt-1 w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded px-2 py-1 text-xs font-medium focus:ring-1 focus:ring-teal-500 outline-none">
+        <input type="text" id="doctor-dept-input" placeholder="Khoa Cấp cứu / Hồi sức" class="mt-1.5 w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded px-2 py-1 text-xs text-slate-600 dark:text-slate-400 focus:ring-1 focus:ring-teal-500 outline-none">
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT VIEW AREA -->
+    <main class="flex-1 p-3 sm:p-6 overflow-y-auto min-w-0">
+
+      <!-- ========================================== -->
+      <!-- TAB 1: HÌNH ẢNH ECG & ĐỒNG BỘ 30 NGÀY -->
+      <!-- ========================================== -->
+      <section id="tab-ecg-gallery" class="tab-content active space-y-4">
+        <!-- Action Header -->
+        <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-xs">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <h2 class="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <i data-lucide="image" class="w-6 h-6 text-teal-600"></i>
+                Kho Hình ảnh ECG & Ca bệnh
+              </h2>
+              <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+                Chụp ảnh từ điện thoại, đồng bộ mở trên máy tính. Tự động tính hạn 30 ngày dọn rác.
+              </p>
+            </div>
+
+            <!-- Upload Controls -->
+            <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+              <!-- Input 1: Thư viện ảnh (Không có capture -> mở Photo Gallery trên iOS/Android) -->
+              <input type="file" id="ecg-gallery-input" accept="image/*" multiple class="hidden">
+              
+              <!-- Input 2: Chụp ảnh trực tiếp bằng Camera (Có capture) -->
+              <input type="file" id="ecg-camera-input" accept="image/*" capture="environment" class="hidden">
+              <select id="ecg-sharing-scope" class="hidden px-2.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs" aria-label="Phạm vi chia sẻ ECG">
+                <option value="personal">Cá nhân</option><option value="team">Chia sẻ kíp/khoa</option>
+              </select>
+
+              <!-- Nút mở Thư viện ảnh -->
+              <button onclick="document.getElementById('ecg-gallery-input').click()" class="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3.5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs sm:text-sm font-semibold shadow-md shadow-teal-600/20 transition active:scale-95" title="Chọn ảnh có sẵn từ Album ảnh">
+                <i data-lucide="image" class="w-4 h-4"></i>
+                <span>Thư viện ảnh</span>
+              </button>
+
+              <!-- Nút mở Camera chụp ngay -->
+              <button onclick="document.getElementById('ecg-camera-input').click()" class="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3.5 py-2.5 bg-slate-800 hover:bg-slate-700 text-white dark:bg-slate-700 dark:hover:bg-slate-600 rounded-xl text-xs sm:text-sm font-semibold shadow-sm transition active:scale-95" title="Mở máy ảnh chụp trực tiếp">
+                <i data-lucide="camera" class="w-4 h-4"></i>
+                <span>Chụp ảnh</span>
+              </button>
+
+              <!-- Nút Nạp Mẫu -->
+              <button onclick="loadDemoECGs()" class="px-3 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl text-xs font-medium transition" title="Tải ảnh mẫu để thử nghiệm">
+                Nạp Mẫu
+              </button>
+            </div>
+          </div>
+
+          <!-- Filter & Search Bar -->
+          <div class="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3 text-xs">
+            <div class="relative flex-1 min-w-[200px]">
+              <i data-lucide="search" class="w-4 h-4 absolute left-3 top-2.5 text-slate-400"></i>
+              <input type="text" id="ecg-search-input" placeholder="Tìm theo tên BN, mã giường, chẩn đoán..." class="w-full pl-9 pr-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-teal-500">
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-slate-500">Lọc:</span>
+              <button onclick="filterECG('all')" class="ecg-filter-btn px-2.5 py-1.5 rounded-lg bg-teal-100 text-teal-800 dark:bg-teal-900/60 dark:text-teal-200 font-medium" data-filter="all">Tất cả (<span id="count-all">0</span>)</button>
+              <button onclick="filterECG('expiring')" class="ecg-filter-btn px-2.5 py-1.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800" data-filter="expiring">Sắp hết hạn (<span id="count-expiring">0</span>)</button>
+              <button onclick="filterECG('pinned')" class="ecg-filter-btn px-2.5 py-1.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800" data-filter="pinned">Đã ghim (<span id="count-pinned">0</span>)</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ECG Grid Gallery -->
+        <div id="ecg-gallery-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Dynamically populated -->
+        </div>
+
+        <!-- Empty state placeholder -->
+        <div id="ecg-empty-state" class="hidden py-16 text-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl bg-white/50 dark:bg-slate-900/50">
+          <i data-lucide="inbox" class="w-12 h-12 mx-auto text-slate-400 mb-2"></i>
+          <p class="text-sm font-semibold text-slate-600 dark:text-slate-300">Chưa có ảnh ECG hoặc ca bệnh nào</p>
+          <p class="text-xs text-slate-400 mt-1 max-w-sm mx-auto">Chụp ảnh từ điện thoại hoặc bấm "Nạp Mẫu" phía trên để trải nghiệm ngay.</p>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- TAB 2: AI ĐỌC & PHÂN TÍCH HÌNH ẢNH ECG -->
+      <!-- ========================================== -->
+      <section id="tab-ecg-ref" class="tab-content hidden space-y-4">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800">
+          <h2 class="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2"><i data-lucide="heart-pulse" class="w-6 h-6 text-teal-600"></i>Tiêu chuẩn ECG bệnh lý</h2>
+          <p class="text-xs text-slate-500 mt-1">Tra cứu tiêu chuẩn chẩn đoán theo khuyến cáo cập nhật. Công cụ tham khảo, không thay thế đọc ECG và phán đoán lâm sàng.</p>
+          <div class="mt-3 flex flex-wrap gap-2">
+            <input id="ecgref-search" placeholder="Tìm: rung nhĩ, STEMI, LBBB, Brugada, QT..." class="flex-1 min-w-[200px] px-3 py-2 rounded-lg text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+            <button onclick="toggleEcgStandardsModal()" class="px-3 py-2 rounded-lg bg-teal-50 dark:bg-teal-950/50 border border-teal-200 dark:border-teal-800 text-teal-800 dark:text-teal-300 text-xs font-semibold">Quy trình đọc 6 bước</button>
+          </div>
+        </div>
+        <div id="ecgref-list" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
+        <p class="text-[11px] text-slate-400">Đối chiếu: Định nghĩa toàn cầu NMCT lần 4 (2018), ACC/AHA ACS 2025, ACC/AHA/ACCP/HRS AF 2023, ESC AF 2024, ESC VA/SCD 2022, ACC/AHA/HRS Chậm nhịp 2018 và SVT 2015/ESC 2019, AHA/ACCF/HRS chuẩn hoá ECG 2009. Hãy đối chiếu bản gốc khi ra quyết định.</p>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- TAB 3: PROTOCOL PHẪU THUẬT & QUY TRÌNH -->
+      <!-- ========================================== -->
+      <section id="tab-protocols" class="tab-content hidden space-y-4">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-xs">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div>
+              <h2 class="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <i data-lucide="scissors" class="w-6 h-6 text-teal-600"></i>
+                Protocol Phẫu thuật & Thủ thuật
+              </h2>
+              <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+                Lưu trữ các phác đồ chuẩn, checklist an toàn phòng mổ, các bước phẫu thuật và xử trí tai biến.
+              </p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="openNewProtocolModal()" class="flex items-center gap-1.5 px-3.5 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-semibold shadow-sm transition">
+                <i data-lucide="plus" class="w-4 h-4"></i>
+                <span>Thêm Protocol mới</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Category filter -->
+          <div class="mt-4 flex flex-wrap gap-2 text-xs" id="protocol-category-pills">
+            <button onclick="filterProtocols('all')" class="proto-pill active px-3 py-1.5 rounded-lg bg-teal-600 text-white font-medium" data-cat="all">Tất cả</button>
+            <button onclick="filterProtocols('Ngoại tiêu hóa')" class="proto-pill px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200" data-cat="Ngoại tiêu hóa">Ngoại tiêu hóa</button>
+            <button onclick="filterProtocols('Cấp cứu - Hồi sức')" class="proto-pill px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200" data-cat="Cấp cứu - Hồi sức">Cấp cứu - Hồi sức</button>
+            <button onclick="filterProtocols('Chấn thương')" class="proto-pill px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200" data-cat="Chấn thương">Chấn thương</button>
+            <button onclick="filterProtocols('An toàn phẫu thuật')" class="proto-pill px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200" data-cat="An toàn phẫu thuật">An toàn phẫu thuật</button>
+          </div>
+        </div>
+
+        <!-- Protocol Cards List -->
+        <div id="protocol-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Dynamically generated -->
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- TAB 4: SỬ DỤNG THUỐC & BỘ TÍNH eGFR / CrCl -->
+      <!-- ========================================== -->
+      <section id="tab-drugs" class="tab-content hidden space-y-4">
+        <!-- Main Top Bar: Drugs & Calculator Tabs -->
+        <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-xs">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div>
+              <h2 class="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <i data-lucide="pill" class="w-6 h-6 text-teal-600"></i>
+                Sử dụng Thuốc & Chỉnh liều Suy thận (eGFR / CrCl)
+              </h2>
+              <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+                Công cụ tính độ thanh thải Creatinine tự động, ước tính mức lọc cầu thận và hướng dẫn chỉnh liều kháng sinh, thuốc kháng đông.
+              </p>
+            </div>
+            
+            <!-- Quick Subtab Switcher -->
+            <div class="flex rounded-xl p-1 bg-slate-100 dark:bg-slate-800 text-xs font-semibold">
+              <button onclick="switchDrugSubTab('egfr')" id="subtab-btn-egfr" class="px-3 py-1.5 rounded-lg bg-white dark:bg-slate-700 text-teal-700 dark:text-teal-300 shadow-xs">
+                🧮 Máy tính eGFR & CrCl
+              </button>
+              <button onclick="switchDrugSubTab('list')" id="subtab-btn-list" class="px-3 py-1.5 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900">
+                📖 Tra cứu Dược thư
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- SUBTAB 1: eGFR & CrCl CALCULATOR (CORE MEDICAL FEATURE) -->
+        <div id="drug-egfr-calculator-view" class="space-y-4">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+            
+            <!-- Left: Clinical Input Form -->
+            <div class="lg:col-span-5 bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
+              <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2.5">
+                <h3 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                  <i data-lucide="calculator" class="w-4 h-4 text-teal-600"></i>
+                  Thông số Người bệnh
+                </h3>
+                <button onclick="resetEgfrInputs()" class="text-xs text-slate-400 hover:text-teal-600 flex items-center gap-1">
+                  <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                  <span>Làm mới</span>
+                </button>
+              </div>
+
+              <!-- Input Grid -->
+              <div class="space-y-3.5 text-xs">
+                <!-- Giới tính -->
+                <div>
+                  <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Giới tính sinh học</label>
+                  <div class="grid grid-cols-2 gap-2">
+                    <button type="button" id="egfr-gender-male" onclick="setEgfrGender('male')" class="py-2 px-3 rounded-xl border border-teal-600 bg-teal-50 dark:bg-teal-950/40 text-teal-700 dark:text-teal-300 font-bold flex items-center justify-center gap-1.5 transition">
+                      <span>Nam (Male)</span>
+                    </button>
+                    <button type="button" id="egfr-gender-female" onclick="setEgfrGender('female')" class="py-2 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-medium flex items-center justify-center gap-1.5 transition">
+                      <span>Nữ (Female)</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Tuổi -->
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Tuổi (Năm)</label>
+                    <div class="relative">
+                      <input type="number" id="egfr-age" value="65" min="18" max="110" oninput="calculateEgfr()" class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-teal-500 outline-none">
+                      <span class="absolute right-3 top-2.5 text-slate-400 text-xs">tuổi</span>
+                    </div>
+                  </div>
+
+                  <!-- Cân nặng -->
+                  <div>
+                    <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Cân nặng (kg)</label>
+                    <div class="relative">
+                      <input type="number" id="egfr-weight" value="60" min="20" max="250" step="0.5" oninput="calculateEgfr()" class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-teal-500 outline-none">
+                      <span class="absolute right-3 top-2.5 text-slate-400 text-xs">kg</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Serum Creatinine -->
+                <div>
+                  <div class="flex items-center justify-between mb-1">
+                    <label class="font-semibold text-slate-700 dark:text-slate-300">Creatinine Huyết thanh</label>
+                    <!-- Unit switcher -->
+                    <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-0.5 rounded-lg">
+                      <button type="button" id="unit-umol" onclick="setCreatinineUnit('umol')" class="px-2 py-0.5 rounded text-[11px] font-bold bg-white dark:bg-slate-700 text-teal-700 dark:text-teal-300 shadow-xs">µmol/L</button>
+                      <button type="button" id="unit-mgdl" onclick="setCreatinineUnit('mgdl')" class="px-2 py-0.5 rounded text-[11px] font-medium text-slate-500">mg/dL</button>
+                    </div>
+                  </div>
+                  <div class="relative">
+                    <input type="number" id="egfr-creatinine" value="130" min="1" max="2000" step="1" oninput="calculateEgfr()" class="w-full px-3 py-2.5 rounded-xl border border-teal-500/50 bg-teal-50/20 dark:bg-teal-950/20 text-lg font-bold text-teal-700 dark:text-teal-300 focus:ring-2 focus:ring-teal-500 outline-none font-mono-calc">
+                    <span id="current-unit-display" class="absolute right-3 top-3 text-slate-400 text-xs font-semibold">µmol/L</span>
+                  </div>
+                  <div class="mt-1 text-[11px] text-slate-400 flex items-center justify-between">
+                    <span>Quy đổi: <span id="creatinine-converted-text">130 µmol/L = 1.47 mg/dL</span></span>
+                  </div>
+                </div>
+
+                <!-- Optional: Height (for Ideal body weight if obese) -->
+                <div>
+                  <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Chiều cao (cm) <span class="font-normal text-slate-400">- Tùy chọn</span></label>
+                  <div class="relative">
+                    <input type="number" id="egfr-height" value="165" min="100" max="220" oninput="calculateEgfr()" class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs font-medium text-slate-900 dark:text-white focus:ring-1 focus:ring-teal-500 outline-none">
+                    <span class="absolute right-3 top-2 text-slate-400 text-xs">cm (BMI: <span id="bmi-display">22.0</span>)</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Quick Clinical Preset Buttons -->
+              <div class="pt-3 border-t border-slate-100 dark:border-slate-800">
+                <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block mb-2">Ca lâm sàng nhanh:</span>
+                <div class="grid grid-cols-3 gap-1.5 text-[11px]">
+                  <button type="button" onclick="loadEgfrPreset('normal')" class="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-medium text-center">
+                    Thận bình thường
+                  </button>
+                  <button type="button" onclick="loadEgfrPreset('moderate')" class="p-1.5 rounded-lg bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 text-amber-800 dark:text-amber-300 font-medium text-center">
+                    Suy thận độ 3
+                  </button>
+                  <button type="button" onclick="loadEgfrPreset('severe')" class="p-1.5 rounded-lg bg-red-50 dark:bg-red-950/40 hover:bg-red-100 text-red-800 dark:text-red-300 font-medium text-center">
+                    Suy thận nặng
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: Real-time Clinical Results & Dose Adjustments -->
+            <div class="lg:col-span-7 space-y-4">
+              <!-- Result Cards Grid -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <!-- Cockcroft-Gault Card (Primary for Drug Dosing) -->
+                <div class="bg-gradient-to-br from-teal-500/10 to-teal-500/5 dark:from-teal-950/40 dark:to-slate-900 p-4 rounded-2xl border-2 border-teal-500/30 dark:border-teal-500/40 relative overflow-hidden">
+                  <div class="flex items-center justify-between text-xs font-semibold text-teal-800 dark:text-teal-300 mb-1">
+                    <span class="flex items-center gap-1.5">
+                      <i data-lucide="check-circle" class="w-4 h-4 text-teal-600"></i>
+                      Cockcroft-Gault (CrCl)
+                    </span>
+                    <span class="text-[10px] px-1.5 py-0.5 rounded bg-teal-200/60 dark:bg-teal-900 text-teal-900 dark:text-teal-200 font-bold">Chỉnh liều thuốc</span>
+                  </div>
+                  <div class="mt-2 flex items-baseline gap-2">
+                    <span id="crcl-result-value" class="text-3xl sm:text-4xl font-extrabold text-teal-700 dark:text-teal-300 font-mono-calc">42.5</span>
+                    <span class="text-xs font-bold text-slate-500">mL/phút</span>
+                  </div>
+                  <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1.5">
+                    <span id="crcl-weight-note">Dùng để chỉnh liều thuốc thải qua thận.</span>
+                  </p>
+                </div>
+
+                <!-- CKD-EPI 2021 Card -->
+                <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 relative overflow-hidden">
+                  <div class="flex items-center justify-between text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                    <span>CKD-EPI 2021 (eGFR)</span>
+                    <span class="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">KDIGO</span>
+                  </div>
+                  <div class="mt-2 flex items-baseline gap-2">
+                    <span id="ckdepi-result-value" class="text-3xl sm:text-4xl font-extrabold text-slate-800 dark:text-white font-mono-calc">46.8</span>
+                    <span class="text-xs font-bold text-slate-500">mL/phút/1.73m²</span>
+                  </div>
+                  <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1.5">
+                    Đánh giá chức năng thận tổng thể theo phân loại bệnh thận mạn.
+                  </p>
+                </div>
+              </div>
+
+              <!-- KDIGO Staging & Alert Banner -->
+              <div id="kdigo-stage-card" class="p-4 rounded-2xl border transition-all duration-300 bg-amber-50 dark:bg-amber-950/30 border-amber-300 dark:border-amber-800 text-amber-900 dark:text-amber-200">
+                <div class="flex items-start gap-3">
+                  <div id="kdigo-icon-wrap" class="p-2 rounded-xl bg-amber-100 dark:bg-amber-900/60 text-amber-700 dark:text-amber-300">
+                    <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+                  </div>
+                  <div class="flex-1">
+                    <div class="flex items-center justify-between">
+                      <span id="kdigo-stage-title" class="font-bold text-sm">Giai đoạn G3a: Giảm mức lọc cầu thận nhẹ đến vừa</span>
+                      <span id="kdigo-badge" class="text-xs px-2 py-0.5 rounded-full font-bold bg-amber-200 dark:bg-amber-900 text-amber-900 dark:text-amber-100">G3a</span>
+                    </div>
+                    <p id="kdigo-clinical-advice" class="text-xs text-amber-800/90 dark:text-amber-200/90 mt-1 leading-relaxed">
+                      Cần giảm liều một số kháng sinh bài tiết qua thận. Tránh các thuốc độc thận liều cao (NSAIDs, Aminoglycoside nếu không thật sự cần thiết).
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Drug Specific Adjustment Table for this eGFR -->
+              <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-800 shadow-xs">
+                <div class="flex items-center justify-between mb-3">
+                  <h4 class="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
+                    <i data-lucide="shield-check" class="w-4 h-4 text-teal-600"></i>
+                    Khuyến cáo Chỉnh Liều Thuốc Lâm Sàng cho Mức CrCl này:
+                  </h4>
+                  <span class="text-[11px] text-slate-400">Tự động cập nhật</span>
+                </div>
+
+                <div class="overflow-x-auto">
+                  <table class="w-full text-left text-xs">
+                    <thead>
+                      <tr class="border-b border-slate-100 dark:border-slate-800 text-slate-400">
+                        <th class="pb-2 font-semibold">Nhóm thuốc</th>
+                        <th class="pb-2 font-semibold">Tên thuốc</th>
+                        <th class="pb-2 font-semibold">Hướng dẫn chỉnh liều theo CrCl</th>
+                        <th class="pb-2 font-semibold text-right">Mức độ cảnh báo</th>
+                      </tr>
+                    </thead>
+                    <tbody id="drug-adjustment-tbody" class="divide-y divide-slate-100 dark:divide-slate-800/60">
+                      <!-- Dynamic rows based on CrCl -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SUBTAB 2: EMERGENCY & COMMON DRUG FORMULARY -->
+        <div id="drug-list-view" class="hidden space-y-4">
+          <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-800">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-3 mb-4">
+              <h3 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <i data-lucide="book-open" class="w-4 h-4 text-teal-600"></i>
+                Bảng Pha & Dùng Thuốc Cấp cứu / Hồi sức
+              </h3>
+              <input type="text" id="drug-search-input" oninput="filterDrugList()" placeholder="Tìm nhanh: Adrenalin, Noradrenalin, Lovenox..." class="w-full sm:w-64 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs">
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3" id="drug-cards-container">
+              <!-- Populated by JavaScript -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- TAB 5: BÁO CÁO GIAO BAN & CA TRỰC -->
+      <!-- ========================================== -->
+      <section id="tab-briefing" class="tab-content hidden space-y-4">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-xs">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div>
+              <h2 class="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <i data-lucide="clipboard-list" class="w-6 h-6 text-teal-600"></i>
+                Sổ Báo Cáo Giao Ban Ca Trực
+              </h2>
+              <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+                Ghi chép số liệu ca trực, bàn giao bệnh nhân nặng và xuất nội dung 1 chạm để gửi Zalo khoa hoặc in báo cáo.
+              </p>
+            </div>
+            <div class="flex items-center gap-2 w-full sm:w-auto">
+              <button onclick="copyBriefingText()" class="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3.5 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-semibold shadow-sm transition active:scale-95">
+                <i data-lucide="copy" class="w-4 h-4"></i>
+                <span>Copy gửi Zalo / Báo cáo</span>
+              </button>
+              <button onclick="window.print()" class="p-2 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800" title="In báo cáo giao ban">
+                <i data-lucide="printer" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+          <!-- Form Input -->
+          <div class="lg:col-span-6 bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-800 space-y-4 text-xs">
+            <h3 class="font-bold text-slate-800 dark:text-slate-200 border-b border-slate-100 dark:border-slate-800 pb-2 flex items-center justify-between">
+              <span>BÁO CÁO GIAO BAN TRỰC NGOẠI</span>
+              <span class="text-[11px] font-normal text-teal-600 dark:text-teal-400">Chuẩn Ngoại khoa</span>
+            </h3>
+
+            <!-- Ngày trực & Tua trực -->
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Ngày trực:</label>
+                <input type="date" id="brief-date" oninput="updateBriefingPreview()" class="w-full px-2.5 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs font-medium">
+              </div>
+              <div>
+                <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Tua trực:</label>
+                <input type="text" id="brief-team" value="BS. Trưởng tua + Kíp trực" oninput="updateBriefingPreview()" class="w-full px-2.5 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs font-medium">
+              </div>
+            </div>
+
+            <!-- MỤC I: TỔNG SỐ CA MỔ TRONG NGÀY -->
+            <div class="p-3.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl space-y-2.5 border border-slate-200 dark:border-slate-700/60">
+              <span class="font-bold text-slate-800 dark:text-slate-200 text-xs uppercase tracking-wide flex items-center gap-1.5 text-teal-700 dark:text-teal-400">
+                <i data-lucide="scissors" class="w-4 h-4"></i>
+                I. TỔNG SỐ CA MỔ TRONG NGÀY:
+              </span>
+              <div>
+                <label class="block font-semibold text-slate-600 dark:text-slate-400 mb-0.5">1. Khoa Ngoại CTCH:</label>
+                <input type="text" id="brief-surg-ctch" placeholder="VD: 02 ca (01 KHX đùi, 01 nẹp vis bánh chè)" value="0 ca" oninput="updateBriefingPreview()" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-medium">
+              </div>
+              <div>
+                <label class="block font-semibold text-slate-600 dark:text-slate-400 mb-0.5">2. Khoa Ngoại TH:</label>
+                <input type="text" id="brief-surg-th" placeholder="VD: 03 ca (02 VRTC nội soi, 01 thủng dạ dày)" value="0 ca" oninput="updateBriefingPreview()" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-medium">
+              </div>
+            </div>
+
+            <!-- MỤC II: CHUYỂN VIỆN -->
+            <div class="p-3.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl space-y-2.5 border border-slate-200 dark:border-slate-700/60">
+              <span class="font-bold text-slate-800 dark:text-slate-200 text-xs uppercase tracking-wide flex items-center gap-1.5 text-blue-700 dark:text-blue-400">
+                <i data-lucide="ambulance" class="w-4 h-4"></i>
+                II. Chuyển viện:
+              </span>
+              <div>
+                <label class="block font-semibold text-slate-600 dark:text-slate-400 mb-0.5">1. Khoa Cấp cứu:</label>
+                <input type="text" id="brief-trans-cc" placeholder="VD: 01 ca (Chấn thương sọ não nặng -> Chợ Rẫy)" value="0 ca" oninput="updateBriefingPreview()" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-medium">
+              </div>
+              <div>
+                <label class="block font-semibold text-slate-600 dark:text-slate-400 mb-0.5">2. Khoa Ngoại CTCH:</label>
+                <input type="text" id="brief-trans-ctch" placeholder="VD: 0 ca" value="0 ca" oninput="updateBriefingPreview()" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-medium">
+              </div>
+              <div>
+                <label class="block font-semibold text-slate-600 dark:text-slate-400 mb-0.5">3. Khoa Ngoại TH:</label>
+                <input type="text" id="brief-trans-th" placeholder="VD: 0 ca" value="0 ca" oninput="updateBriefingPreview()" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-medium">
+              </div>
+            </div>
+
+            <!-- MỤC III: BỆNH NHÂN NẶNG -->
+            <div>
+              <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">III. Bệnh nhân nặng / Cần theo dõi hoặc xin ý kiến:</label>
+              <textarea id="brief-heavy-patients" rows="5" oninput="updateBriefingPreview()" class="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs" placeholder="1. Nguyễn Văn A (99 tuổi) - Địa chỉ: Sa Đéc - Đồng Tháp&#10;Δ: Viêm phúc mạc&#10;⇒ Chuyển Bệnh viện Đa khoa TW Cần Thơ (VKN)"></textarea>
+            </div>
+
+            <!-- MỤC IV đã bỏ khỏi giao diện.
+                 Ô ẩn dưới đây chỉ để js/app.js hiện tại (nếu còn đọc #brief-incidents) không báo lỗi.
+                 XÓA dòng này sau khi app.js không còn tham chiếu "brief-incidents" và chữ "IV." -->
+            <textarea id="brief-incidents" class="hidden" tabindex="-1" aria-hidden="true"></textarea>
+          </div>
+
+          <!-- Preview & Copy Area -->
+          <div class="lg:col-span-6 bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2 mb-3">
+                <span class="text-xs font-bold text-slate-700 dark:text-slate-300">Xem trước văn bản xuất ra:</span>
+                <span class="text-[11px] px-2 py-0.5 rounded bg-teal-100 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300 font-semibold">Định dạng chuẩn Zalo</span>
+              </div>
+              <pre id="briefing-preview-text" class="whitespace-pre-wrap font-mono-calc text-xs p-3.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 max-h-[460px] overflow-y-auto leading-relaxed select-all"></pre>
+            </div>
+            
+            <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex justify-end">
+              <button onclick="copyBriefingText()" class="w-full sm:w-auto px-4 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-sm transition">
+                <i data-lucide="check" class="w-4 h-4"></i>
+                <span>Sao chép toàn bộ nội dung</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- TAB 6: KHÁC & THANG ĐIỂM LÂM SÀNG -->
+      <!-- ========================================== -->
+      <section id="tab-misc" class="tab-content hidden space-y-4">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-xs">
+          <h2 class="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <i data-lucide="folder" class="w-6 h-6 text-teal-600"></i>
+            Thang Điểm & Tiện Ích Lâm Sàng Khác
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+            Tra cứu nhanh các thang điểm đánh giá lâm sàng phổ biến khi đi buồng hoặc phân loại tại cấp cứu.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Glasgow Coma Scale -->
+          <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-3">
+            <div class="flex items-center justify-between">
+              <h3 class="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-1.5">
+                <i data-lucide="brain" class="w-4 h-4 text-purple-600"></i>
+                Thang điểm Glasgow (GCS)
+              </h3>
+              <span id="gcs-total" class="px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/60 text-purple-700 dark:text-purple-300 text-xs font-bold">15 Điểm</span>
+            </div>
+            <div class="space-y-2 text-xs">
+              <div>
+                <label class="text-[11px] text-slate-500 block mb-0.5">Mắt (Eye - E):</label>
+                <select id="gcs-eye" onchange="calcGcs()" class="w-full p-1.5 rounded border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs">
+                  <option value="4">4 - Mở tự nhiên</option>
+                  <option value="3">3 - Mở khi gọi</option>
+                  <option value="2">2 - Mở khi gây đau</option>
+                  <option value="1">1 - Không mở</option>
+                </select>
+              </div>
+              <div>
+                <label class="text-[11px] text-slate-500 block mb-0.5">Lời nói (Verbal - V):</label>
+                <select id="gcs-verbal" onchange="calcGcs()" class="w-full p-1.5 rounded border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs">
+                  <option value="5">5 - Trả lời đúng, rõ ràng</option>
+                  <option value="4">4 - Trả lời lú lẫn</option>
+                  <option value="3">3 - Nói từ vô nghĩa</option>
+                  <option value="2">2 - Kêu rên ú ớ</option>
+                  <option value="1">1 - Không đáp ứng</option>
+                </select>
+              </div>
+              <div>
+                <label class="text-[11px] text-slate-500 block mb-0.5">Vận động (Motor - M):</label>
+                <select id="gcs-motor" onchange="calcGcs()" class="w-full p-1.5 rounded border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs">
+                  <option value="6">6 - Làm theo y lệnh</option>
+                  <option value="5">5 - Định vị đúng chỗ đau</option>
+                  <option value="4">4 - Co tay gạt khi đau</option>
+                  <option value="3">3 - Co cứng mất vỏ</option>
+                  <option value="2">2 - Duỗi cứng mất não</option>
+                  <option value="1">1 - Không đáp ứng</option>
+                </select>
+              </div>
+            </div>
+            <div id="gcs-eval" class="p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 text-[11px] font-medium">
+              Tri giác bình thường (15 điểm)
+            </div>
+          </div>
+
+          <!-- CURB-65 Pneumonia -->
+          <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-3">
+            <div class="flex items-center justify-between">
+              <h3 class="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-1.5">
+                <i data-lucide="wind" class="w-4 h-4 text-cyan-600"></i>
+                Thang điểm CURB-65
+              </h3>
+              <span id="curb-total" class="px-2 py-0.5 rounded-full bg-cyan-100 dark:bg-cyan-900/60 text-cyan-700 dark:text-cyan-300 text-xs font-bold">0 Điểm</span>
+            </div>
+            <p class="text-[11px] text-slate-400">Đánh giá độ nặng viêm phổi cộng đồng:</p>
+            <div class="space-y-1.5 text-xs">
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" id="curb-c" onchange="calcCurb()" class="rounded text-teal-600">
+                <span><b>C</b> - Confusion (Lú lẫn, mất định hướng)</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" id="curb-u" onchange="calcCurb()" class="rounded text-teal-600">
+                <span><b>U</b> - Ure máu &gt; 7 mmol/L (BUN &gt; 19 mg/dL)</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" id="curb-r" onchange="calcCurb()" class="rounded text-teal-600">
+                <span><b>R</b> - Nhịp thở &ge; 30 lần/phút</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" id="curb-b" onchange="calcCurb()" class="rounded text-teal-600">
+                <span><b>B</b> - HA tâm thu &lt; 90 hoặc tâm trương &le; 60</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" id="curb-65" onchange="calcCurb()" class="rounded text-teal-600">
+                <span><b>65</b> - Tuổi &ge; 65</span>
+              </label>
+            </div>
+            <div id="curb-eval" class="p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 text-[11px] font-medium">
+              Nguy cơ thấp (Nhóm 1): Điều trị ngoại trú
+            </div>
+          </div>
+
+          <div id="score-widgets" class="contents"></div>
+          <!-- Doctor's Personal Note Scratchpad -->
+          <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 flex flex-col justify-between space-y-2">
+            <div>
+              <div class="flex items-center justify-between">
+                <h3 class="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-1.5">
+                  <i data-lucide="edit-3" class="w-4 h-4 text-amber-500"></i>
+                  Sổ Ghi Chú Nhanh Bác Sĩ
+                </h3>
+                <span class="text-[10px] text-slate-400">Tự lưu</span>
+              </div>
+              <textarea id="doctor-scratchpad" rows="8" placeholder="Ghi chú nhanh ca trực, số điện thoại người nhà, lời dặn của thầy..." class="mt-2 w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs focus:ring-1 focus:ring-teal-500 outline-none"></textarea>
+            </div>
+            <div class="flex justify-between items-center text-[11px] text-slate-400">
+              <span id="scratchpad-status">Đã lưu tự động</span>
+              <button onclick="clearScratchpad()" class="hover:text-red-500">Xóa trắng</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- MOBILE BOTTOM NAVIGATION BAR -->
+  <nav class="no-print md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 flex justify-around py-1.5 px-1 shadow-lg">
+    <!-- Populated by JS -->
+  </nav>
+
+  <!-- MODAL: LIGHTBOX ECG IMAGE FULLSCREEN VIEWER -->
+  <div id="lightbox-modal" class="fixed inset-0 z-50 bg-black/90 hidden backdrop-blur-sm flex flex-col items-center justify-between p-3">
+    <!-- Top toolbar -->
+    <div class="w-full flex items-center justify-between text-white py-2 px-3">
+      <div class="flex items-center gap-2">
+        <i data-lucide="file-text" class="w-5 h-5 text-teal-400"></i>
+        <span id="lightbox-title" class="text-sm font-semibold truncate max-w-[200px] sm:max-w-md">Ảnh ECG</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="zoomLightbox(0.2)" class="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white" title="Phóng to">
+          <i data-lucide="zoom-in" class="w-5 h-5"></i>
+        </button>
+        <button onclick="zoomLightbox(-0.2)" class="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white" title="Thu nhỏ">
+          <i data-lucide="zoom-out" class="w-5 h-5"></i>
+        </button>
+        <button onclick="resetLightboxZoom()" class="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white" title="Khôi phục kích thước">
+          <i data-lucide="maximize-2" class="w-5 h-5"></i>
+        </button>
+        <button onclick="copyLightboxImage()" class="p-2 rounded-lg bg-teal-600 hover:bg-teal-700 text-white" title="Copy ảnh">
+          <i data-lucide="copy" class="w-5 h-5"></i>
+        </button>
+        <a id="lightbox-download-link" href="#" download="ecg-scan.jpg" class="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white" title="Tải về máy">
+          <i data-lucide="download" class="w-5 h-5"></i>
+        </a>
+        <button onclick="closeLightbox()" class="p-2 rounded-lg bg-red-600/80 hover:bg-red-600 text-white ml-2" title="Đóng">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Center image view with zoom -->
+    <div id="lightbox-viewport" class="lightbox-viewport flex-1 w-full flex items-center justify-center p-2 relative">
+      <img id="lightbox-img" src="" draggable="false" class="max-h-full max-w-full object-contain select-none shadow-2xl">
+    </div>
+
+    <div class="text-slate-400 text-xs py-1">
+      Gợi ý: Pinch 2 ngón để phóng to/thu nhỏ, kéo ảnh để di chuyển; có thể dùng nút +/- hoặc cuộn chuột.
+    </div>
+  </div>
+
+  <!-- MODAL: BẢNG TRA CỨU TIÊU CHUẨN ĐIỆN TÂM ĐỒ (GS. TRẦN ĐỖ TRINH & BS. BÙI CAO MỸ ÁI) -->
+  <div id="ecg-standards-modal" class="fixed inset-0 z-50 bg-black/80 hidden backdrop-blur-sm flex items-center justify-center p-3 sm:p-5">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-4xl w-full max-h-[90vh] flex flex-col border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden">
+      <!-- Modal Header -->
+      <div class="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-800/50">
+        <div class="flex items-center gap-2.5">
+          <span class="p-2 bg-teal-600 text-white rounded-xl shadow-xs">
+            <i data-lucide="book-open" class="w-5 h-5"></i>
+          </span>
+          <div>
+            <h3 class="text-base font-bold text-slate-900 dark:text-white">Hệ Thống Tiêu Chuẩn Đọc Điện Tâm Đồ Lâm Sàng</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Đúc kết từ tài liệu <b>GS. Trần Đỗ Trinh</b> (ĐH Y Dược Huế) & <b>BS. Bùi Cao Mỹ Ái</b></p>
+          </div>
+        </div>
+        <button onclick="toggleEcgStandardsModal()" class="p-2 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body (Scrollable) -->
+      <div class="p-4 sm:p-6 overflow-y-auto space-y-5 text-xs text-slate-700 dark:text-slate-300">
+        
+        <!-- Quy tắc cốt lõi 3, 3, 3 và 5 -->
+        <div class="p-3.5 rounded-xl bg-teal-50 dark:bg-teal-950/40 border border-teal-200 dark:border-teal-800">
+          <h4 class="font-bold text-teal-900 dark:text-teal-200 text-sm flex items-center gap-1.5 mb-2">
+            <i data-lucide="bookmark" class="w-4 h-4 text-teal-600"></i>
+            Quy tắc vàng ghi nhớ nhanh: "3, 3, 3 và 5" (BS. Bùi Cao Mỹ Ái)
+          </h4>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
+            <div class="bg-white dark:bg-slate-900 p-2 rounded-lg border border-teal-200/60 dark:border-teal-900">
+              <span class="block text-[11px] text-slate-400">Sóng P Rộng</span>
+              <span class="font-bold text-teal-700 dark:text-teal-300 text-sm">&le; 3 ô (0.12s)</span>
+            </div>
+            <div class="bg-white dark:bg-slate-900 p-2 rounded-lg border border-teal-200/60 dark:border-teal-900">
+              <span class="block text-[11px] text-slate-400">Sóng P Cao</span>
+              <span class="font-bold text-teal-700 dark:text-teal-300 text-sm">&le; 3 ô (0.3mV)</span>
+            </div>
+            <div class="bg-white dark:bg-slate-900 p-2 rounded-lg border border-teal-200/60 dark:border-teal-900">
+              <span class="block text-[11px] text-slate-400">QRS Rộng</span>
+              <span class="font-bold text-teal-700 dark:text-teal-300 text-sm">&le; 3 ô (0.12s)</span>
+            </div>
+            <div class="bg-white dark:bg-slate-900 p-2 rounded-lg border border-teal-200/60 dark:border-teal-900">
+              <span class="block text-[11px] text-slate-400">Khoảng PR</span>
+              <span class="font-bold text-teal-700 dark:text-teal-300 text-sm">&le; 5 ô (0.20s)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6 Bước Chuẩn Mực Đọc Điện Tim (GS. Trần Đỗ Trinh) -->
+        <div class="space-y-4">
+          <h4 class="font-bold text-slate-900 dark:text-white text-sm uppercase tracking-wider border-b border-slate-200 dark:border-slate-800 pb-1 flex items-center gap-2">
+            <i data-lucide="layers" class="w-4 h-4 text-purple-600"></i>
+            Chi tiết 6 bước đọc điện tim chuẩn mực
+          </h4>
+
+          <!-- Bước 1 -->
+          <div class="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl space-y-1.5 border border-slate-200 dark:border-slate-700/60">
+            <b class="text-teal-700 dark:text-teal-300">Bước 1: Kỹ thuật ghi & Định chuẩn (Calibration)</b>
+            <p>• <b>Tốc độ 25mm/s:</b> 1 ô nhỏ 1mm = 0.04s; 1 ô lớn 5mm = 0.20s. (Nếu 50mm/s thì 1 ô nhỏ = 0.02s).</p>
+            <p>• <b>Điện thế 1mV = 10mm:</b> 1 ô nhỏ = 0.1mV. Lưu ý ký hiệu <b>2N</b> (20mm=1mV &rarr; chia đôi biên độ đọc) hoặc <b>N/2</b> (5mm=1mV &rarr; nhân đôi biên độ đọc).</p>
+            <p>• <b>Bẫy mắc ngược điện cực tay:</b> Dây đỏ (tay phải) nhầm sang tay trái &rarr; DI âm toàn bộ (P, QRS, T đều âm), DII thành DIII, aVR đảo với aVL; trước ngực không đổi.</p>
+            <p>• <b>Định luật Einthoven:</b> DI + DIII = DII. Nhiễu xoay chiều 50Hz gây "tòe đều" dọc đường ghi (do đứt dây đất); Run cơ gây sóng lăn tăn không đều.</p>
+          </div>
+
+          <!-- Bước 2 -->
+          <div class="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl space-y-1.5 border border-slate-200 dark:border-slate-700/60">
+            <b class="text-teal-700 dark:text-teal-300">Bước 2: Phân tích Nhịp tim & Tần số tim</b>
+            <p>• <b>5 Tiêu chuẩn Nhịp Xoang:</b> (1) Có sóng P đi trước mỗi QRST; (2) P dương ở DI, DII, aVF, V5, V6; P âm ở aVR; (3) Khoảng PQ/PR hằng định (0.12 - 0.20s); (4) Hình dạng sóng P đồng nhất trên cùng chuyển đạo; (5) Tần số 60 - 100 lần/phút (chênh lệch PP max-min &lt; 0.16s).</p>
+            <p>• <b>Cách tính tần số:</b> Nhịp đều: <b>300 / số ô lớn</b> hoặc <b>1500 / số ô nhỏ</b> hoặc <b>60 / RR (giây)</b>. Nhịp không đều: Đếm số đỉnh R trong 30 ô lớn (6 giây) &times; 10.</p>
+            <p>• <b>Phương pháp băng vạch nhịp PP:</b> Dùng băng giấy chia khoảng PP để truy tìm sóng P "ẩn náu" trong QRS/ST/T nhằm chẩn đoán Nhịp nhanh thất, Phân ly nhĩ thất hoặc Block AV cấp 3.</p>
+            <p>• <b>Loạn nhịp thường gặp:</b> Rung nhĩ (mất P, thay bằng sóng f lăn tăn 400-600 ck/p, RR hoàn toàn không đều); Cuồng nhĩ (sóng F răng cưa 300 ck/p); Ngoại tâm thu thất (QRS &ge; 0.13s giãn rộng, ST-T trái chiều, nghỉ bù hoàn toàn RR'R = 2RR); Ngoại tâm thu trên thất (P' sớm, biến dạng, không nghỉ bù); Cơn nhịp nhanh kịch phát trên thất SVT (140-220 ck/p đều tăm tắp).</p>
+          </div>
+
+          <!-- Bước 3 -->
+          <div class="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl space-y-1.5 border border-slate-200 dark:border-slate-700/60">
+            <b class="text-teal-700 dark:text-teal-300">Bước 3: Trục điện tim & Tư thế tim (Tam trục kép Bayley)</b>
+            <p>• <b>Tam trục kép Bayley:</b> 3 cặp vuông góc DI &perp; aVF; DII &perp; aVL; DIII &perp; aVR.</p>
+            <p>• <b>Góc &alpha; người Việt Nam:</b> Trung bình <b>+65&deg;</b> (biến thiên bình thường từ +26&deg; đến +100&deg;).</p>
+            <p>• <b>Phân loại trục:</b> Trung gian (0&deg; đến +90&deg;); Trục trái (0&deg; đến -90&deg;); Trục phải (+90&deg; đến +180&deg;); Trục vô định (-90&deg; đến -150&deg;).</p>
+            <p>• <b>Tư thế tim:</b> Tim nằm (aVL dương, aVF âm dạng rS, hình ảnh Q1S3); Tim đứng (aVL âm dạng rS, aVF dương dạng qR, hình ảnh S1Q3); Mỏm tim ra sau (S1S2S3).</p>
+          </div>
+
+          <!-- Bước 4 -->
+          <div class="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl space-y-1.5 border border-slate-200 dark:border-slate-700/60">
+            <b class="text-teal-700 dark:text-teal-300">Bước 4: Khảo sát Sóng P & Dẫn truyền Nhĩ Thất (PQ/PR)</b>
+            <p>• <b>Sóng P bình thường:</b> Thời gian 0.08s (0.05 - 0.11s), biên độ 1.2mm (0.5 - 2.0mm).</p>
+            <p>• <b>Dày nhĩ phải (P phế):</b> P cao &gt; 2.5mm, nhọn đối xứng ở DII, DIII, aVF (gặp trong tâm phế mạn, Fallot, hẹp ĐMP).</p>
+            <p>• <b>Dày nhĩ trái (P hai lá):</b> P rộng &gt; 0.12s, 2 đỉnh có móc, pha âm ở V1 rộng và sâu (&gt; 0.04 mm&bull;s) (gặp trong hẹp/hở van hai lá, tăng huyết áp).</p>
+            <p>• <b>Khoảng PQ/PR:</b> 0.12 - 0.20s (trung bình 0.15s). Ngắn &lt; 0.12s + sóng Delta (&Delta;) &rarr; Hội chứng Wolff-Parkinson-White (WPW). Dài &gt; 0.20s &rarr; Block AV độ 1. Dài dần đến rớt QRS &rarr; Block AV độ 2 Mobitz 1 (Wenckebach). P và QRS độc lập &rarr; Block AV độ 3.</p>
+          </div>
+
+          <!-- Bước 5 -->
+          <div class="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl space-y-1.5 border border-slate-200 dark:border-slate-700/60">
+            <b class="text-teal-700 dark:text-teal-300">Bước 5: Khảo sát Phức bộ QRS (Khử cực thất)</b>
+            <p>• <b>Thời gian QRS:</b> Bình thường 0.07s (0.05 - 0.10s). Nhánh nội điện: V1-V2 &le; 0.035s; V5-V6 &le; 0.045s.</p>
+            <p>• <b>Sóng Q hoại tử (Quy tắc Minnesota / GS. Trần Đỗ Trinh):</b> Rộng &ge; 0.04s hoặc sâu &ge; 1/4 R tương ứng (ngoại biên sâu &ge; 3mm, D3-aVF sâu &ge; 5mm); hoặc dạng QS từ V1 đến V4 &rarr; Nhồi máu cơ tim.</p>
+            <p>• <b>Block nhánh phải (RBBB):</b> QRS &ge; 0.12s, dạng rsR' hoặc rSR' ở V1, V3R; nhánh nội điện V1 muộn &gt; 0.055s; S rộng ở DI, V5, V6.</p>
+            <p>• <b>Block nhánh trái (LBBB):</b> QRS &ge; 0.12s, sóng R rộng có móc/khấc ở DI, aVL, V5, V6; mất Q và S; nhánh nội điện V5-V6 muộn &gt; 0.055s; dạng QS hoặc rS sâu ở V1-V2.</p>
+            <p>• <b>Dày thất trái (LVH):</b> Sokolow-Lyon RV5/V6 + SV1/V2 &ge; 35mm; RaVL &gt; 12mm; ST chênh xuống và T âm ở V5, V6 (tăng gánh tâm thu).</p>
+            <p>• <b>Dày thất phải (RVH):</b> RV1 &ge; 7mm, RV1 + SV5 &gt; 11mm, tỉ số R/S ở V1 &gt; 1, trục phải &ge; +110&deg;.</p>
+            <p>• <b>Điện thế thấp:</b> QRS lớn nhất ngoại biên &le; 5mm, trước tim &le; 10mm (Tràn dịch màng ngoài tim, phù toàn thân, khí phế thũng).</p>
+          </div>
+
+          <!-- Bước 6 -->
+          <div class="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl space-y-1.5 border border-slate-200 dark:border-slate-700/60">
+            <b class="text-teal-700 dark:text-teal-300">Bước 6: Khảo sát Tái cực Thất (Đoạn ST, Sóng T, Khoảng QT & Sóng U)</b>
+            <p>• <b>Đoạn ST:</b> Đo từ điểm J so với đường đẳng điện TP. ST chênh lên &ge; 2mm ở V1-V4, &ge; 1mm ở chuyển đạo khác &rarr; NMCT cấp STEMI (sóng một pha cong vòm). ST chênh lõm lan tỏa không soi gương &rarr; Viêm màng ngoài tim cấp. ST chênh xuống đáy chén hình thìa &rarr; Ngấm Digitalis.</p>
+            <p>• <b>Định khu NMCT:</b> Trước vách (V1-V3); Trước bên (V5-V6, DI, aVL); Thành dưới (DII, DIII, aVF có soi gương ở DI, aVL); Sau thực thụ (V7-V9 hoặc soi gương R cao ở V1-V2).</p>
+            <p>• <b>Sóng T:</b> Sóng vành Pardee (T âm sâu, nhọn, hai sườn cân đối); T cao nhọn đối xứng lều đáy hẹp (&gt; 10mm trước ngực, &gt; 5mm ngoại vi) &rarr; Tăng Kali máu cấp cứu; T dẹt/âm &rarr; Hạ Kali máu, thiếu máu cơ tim.</p>
+            <p>• <b>Khoảng QT / QTc (Bazett QTc = QT / &radic;RR):</b> Bình thường nam &lt; 0.44s, nữ &lt; 0.46s. QTc kéo dài &gt; 0.46 - 0.50s &rarr; Nguy cơ xoắn đỉnh (Torsades de Pointes).</p>
+            <p>• <b>Sóng U:</b> Bình thường ở V2-V3 cao &le; 1-2mm. Sóng U cao dính vào T &rarr; Hạ Kali máu nặng.</p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="p-3 border-t border-slate-200 dark:border-slate-800 flex justify-end bg-slate-50 dark:bg-slate-800/50">
+        <button onclick="toggleEcgStandardsModal()" class="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-semibold">
+          Đóng cửa sổ
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: SUPABASE AUTH -->
+  <div id="auth-modal" class="fixed inset-0 z-[60] hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-3">
+    <div class="w-full max-w-md rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-2xl p-5">
+      <div class="flex items-center justify-between gap-3 mb-4">
+        <div><h2 id="auth-modal-title" class="text-lg font-bold text-slate-900 dark:text-white">Đăng nhập Clinical Desk</h2><p class="text-xs text-slate-500 mt-1">Tài khoản Supabase Auth · Phân quyền theo bác sĩ/kíp khoa</p></div>
+        <button type="button" onclick="closeAuthModal()" class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800" aria-label="Đóng"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <div id="auth-signed-in-panel" class="hidden space-y-3">
+        <div class="rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 p-3 text-xs"><div class="font-semibold text-emerald-800 dark:text-emerald-300">Đang đăng nhập</div><div id="auth-current-user" class="text-emerald-700 dark:text-emerald-200 mt-1 break-all"></div><div id="auth-current-scope" class="text-emerald-700/80 dark:text-emerald-200/80 mt-1"></div></div>
+        <button id="auth-signout-btn" type="button" class="w-full px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-sm font-semibold">Đăng xuất</button>
+      </div>
+      <form id="auth-form" class="space-y-3">
+        <div id="auth-profile-fields" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <label class="text-xs font-medium text-slate-600 dark:text-slate-300">Tên bác sĩ<input id="auth-display-name" autocomplete="name" class="mt-1 w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-sm" placeholder="BS. Nguyễn Văn A"></label>
+          <label class="text-xs font-medium text-slate-600 dark:text-slate-300">Khoa<input id="auth-department" class="mt-1 w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-sm" placeholder="Khoa Cấp cứu"></label>
+        </div>
+        <label class="block text-xs font-medium text-slate-600 dark:text-slate-300">Email<input id="auth-email" type="email" required autocomplete="username" class="mt-1 w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2.5 text-sm" placeholder="bacsi@benhvien.vn"></label>
+        <label class="block text-xs font-medium text-slate-600 dark:text-slate-300">Mật khẩu<input id="auth-password" type="password" required minlength="8" autocomplete="current-password" class="mt-1 w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2.5 text-sm" placeholder="Ít nhất 8 ký tự"></label>
+        <button id="auth-submit-btn" type="submit" class="w-full px-4 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-sm font-semibold">Đăng nhập</button>
+        <button id="auth-mode-toggle" type="button" class="w-full py-1 text-xs font-semibold text-teal-700 dark:text-teal-300">Chưa có tài khoản? Tạo tài khoản</button>
+      </form>
+      <p class="mt-3 text-[10px] leading-relaxed text-slate-400">Không dùng khóa service_role ở trình duyệt. Quyền truy cập dữ liệu và ảnh được kiểm soát ở Supabase bằng RLS và Storage policies.</p>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toast-container" class="no-print fixed bottom-20 md:bottom-6 right-6 z-50 space-y-2 pointer-events-none"></div>
+
+  <!-- MODULAR JAVASCRIPT -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+  <script src="./js/config.js" defer></script>
+  <script src="./js/data/ecg-ref.js" defer></script>
+  <script src="./js/data/scores.js" defer></script>
+  <script src="./js/data/protocols.js" defer></script>
+  <script src="./js/data/emergency-drugs.js" defer></script>
+  <script src="./js/calculations.js" defer></script>
+  <script src="./js/supabase-service.js" defer></script>
+  <script src="./js/app.js" defer></script>
+</body>
+</html>
