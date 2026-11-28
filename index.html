@@ -240,21 +240,27 @@
                 Lưu trữ các phác đồ chuẩn, checklist an toàn phòng mổ, các bước phẫu thuật và xử trí tai biến.
               </p>
             </div>
-            <div class="flex items-center gap-2">
-              <button onclick="openNewProtocolModal()" class="flex items-center gap-1.5 px-3.5 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-semibold shadow-sm transition">
+            <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+              <button onclick="resetDefaultProtocols()" class="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-xl text-xs font-medium transition" title="Khôi phục lại danh sách protocol mẫu chuẩn ban đầu">
+                <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                <span>Khôi phục mẫu</span>
+              </button>
+              <button onclick="openNewProtocolModal()" class="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3.5 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-semibold shadow-sm transition active:scale-95">
                 <i data-lucide="plus" class="w-4 h-4"></i>
                 <span>Thêm Protocol mới</span>
               </button>
             </div>
           </div>
 
-          <!-- Category filter -->
-          <div class="mt-4 flex flex-wrap gap-2 text-xs" id="protocol-category-pills">
-            <button onclick="filterProtocols('all')" class="proto-pill active px-3 py-1.5 rounded-lg bg-teal-600 text-white font-medium" data-cat="all">Tất cả</button>
-            <button onclick="filterProtocols('Ngoại tiêu hóa')" class="proto-pill px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200" data-cat="Ngoại tiêu hóa">Ngoại tiêu hóa</button>
-            <button onclick="filterProtocols('Cấp cứu - Hồi sức')" class="proto-pill px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200" data-cat="Cấp cứu - Hồi sức">Cấp cứu - Hồi sức</button>
-            <button onclick="filterProtocols('Chấn thương')" class="proto-pill px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200" data-cat="Chấn thương">Chấn thương</button>
-            <button onclick="filterProtocols('An toàn phẫu thuật')" class="proto-pill px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200" data-cat="An toàn phẫu thuật">An toàn phẫu thuật</button>
+          <!-- Search & Category filter -->
+          <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div class="flex flex-wrap gap-2 text-xs" id="protocol-category-pills">
+              <!-- Dynamically populated -->
+            </div>
+            <div class="relative w-full md:w-64">
+              <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-400"></i>
+              <input type="text" id="protocol-search-input" oninput="onProtocolSearch(this.value)" placeholder="Tìm kiếm protocol, chỉ định..." class="w-full pl-8 pr-3 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs focus:ring-1 focus:ring-teal-500 outline-none">
+            </div>
           </div>
         </div>
 
@@ -900,6 +906,93 @@
           Đóng cửa sổ
         </button>
       </div>
+    </div>
+  </div>
+
+  <!-- MODAL: THÊM / CHỈNH SỬA PROTOCOL PHẪU THUẬT -->
+  <div id="protocol-modal" class="fixed inset-0 z-50 bg-black/80 hidden backdrop-blur-xs flex items-center justify-center p-3 sm:p-5">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-2xl w-full max-h-[92vh] flex flex-col border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden">
+      <!-- Modal Header -->
+      <div class="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-800/50">
+        <div class="flex items-center gap-2.5">
+          <span class="p-2 bg-teal-600 text-white rounded-xl shadow-xs">
+            <i data-lucide="scissors" class="w-5 h-5"></i>
+          </span>
+          <div>
+            <h3 id="proto-modal-title" class="text-base font-bold text-slate-900 dark:text-white">Thêm Protocol Mới</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Phác đồ phẫu thuật, thủ thuật và lưu ý hậu phẫu</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeProtocolModal()" class="p-2 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body (Form) -->
+      <form id="protocol-form" onsubmit="saveProtocolForm(event)" class="p-4 sm:p-6 overflow-y-auto space-y-3.5 text-xs">
+        <input type="hidden" id="proto-form-id" value="">
+
+        <!-- Tên protocol -->
+        <div>
+          <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Tên phẫu thuật / Thủ thuật <span class="text-red-500">*</span></label>
+          <input type="text" id="proto-form-title" required placeholder="VD: Quy trình Cắt ruột thừa nội soi" class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-medium focus:ring-2 focus:ring-teal-500 outline-none">
+        </div>
+
+        <!-- Chuyên khoa -->
+        <div>
+          <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Chuyên khoa / Phân loại <span class="text-red-500">*</span></label>
+          <div class="flex gap-2">
+            <select id="proto-form-category-select" onchange="onProtoCategorySelect(this.value)" class="w-1/2 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-medium focus:ring-2 focus:ring-teal-500 outline-none">
+              <option value="Ngoại tiêu hóa">Ngoại tiêu hóa</option>
+              <option value="Cấp cứu - Hồi sức">Cấp cứu - Hồi sức</option>
+              <option value="Chấn thương">Chấn thương</option>
+              <option value="An toàn phẫu thuật">An toàn phẫu thuật</option>
+              <option value="Ngoại lồng ngực - Mạch máu">Ngoại lồng ngực - Mạch máu</option>
+              <option value="Ngoại niệu">Ngoại niệu</option>
+              <option value="Khác">Chuyên khoa khác (tự nhập)...</option>
+            </select>
+            <input type="text" id="proto-form-category-custom" placeholder="Nhập chuyên khoa..." class="hidden flex-1 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-medium focus:ring-2 focus:ring-teal-500 outline-none">
+          </div>
+        </div>
+
+        <!-- Chỉ định -->
+        <div>
+          <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Chỉ định can thiệp</label>
+          <input type="text" id="proto-form-indication" placeholder="VD: Viêm ruột thừa cấp, viêm phúc mạc..." class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-medium focus:ring-2 focus:ring-teal-500 outline-none">
+        </div>
+
+        <!-- Các bước thực hiện -->
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label class="block font-semibold text-slate-700 dark:text-slate-300">Các bước tiến hành chính <span class="text-red-500">*</span></label>
+            <span class="text-[10px] text-slate-400">Xuống dòng cho mỗi bước (1 dòng = 1 bước)</span>
+          </div>
+          <textarea id="proto-form-steps" rows="6" required placeholder="Tư thế bệnh nhân, vô cảm...&#10;Đặt Trocar / Rạch da bộc lộ phẫu trường...&#10;Thao tác phẫu tích, xử lý bệnh phẩm...&#10;Kiểm tra cầm máu, đóng vết mổ..." class="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white text-xs leading-relaxed focus:ring-2 focus:ring-teal-500 outline-none font-sans"></textarea>
+        </div>
+
+        <!-- Tai biến & Lưu ý -->
+        <div>
+          <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Tai biến & Lưu ý cần tránh</label>
+          <input type="text" id="proto-form-complications" placeholder="VD: Chảy máu mạc treo, tổn thương ống mật chủ, rò mỏm cụt..." class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-medium focus:ring-2 focus:ring-teal-500 outline-none">
+        </div>
+
+        <!-- Chăm sóc hậu phẫu -->
+        <div>
+          <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Theo dõi & Chăm sóc hậu phẫu</label>
+          <input type="text" id="proto-form-postop" placeholder="VD: Kháng sinh dự phòng, theo dõi dịch dẫn lưu, xuất viện sau 24-48h..." class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-medium focus:ring-2 focus:ring-teal-500 outline-none">
+        </div>
+
+        <!-- Modal Footer Buttons -->
+        <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+          <button type="button" onclick="closeProtocolModal()" class="px-4 py-2 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold transition">
+            Hủy bỏ
+          </button>
+          <button type="submit" class="px-5 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-bold flex items-center gap-1.5 shadow-sm transition active:scale-95">
+            <i data-lucide="check" class="w-4 h-4"></i>
+            <span id="proto-modal-submit-text">Lưu Protocol</span>
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 
@@ -1867,56 +1960,122 @@
     ];
 
     let protocols = [];
+    let currentProtoCategory = 'all';
+    let protocolSearchQuery = '';
 
     function loadProtocols() {
       const stored = localStorage.getItem('clinical_desk_protocols_v1');
       protocols = stored ? JSON.parse(stored) : DEFAULT_PROTOCOLS;
+      updateProtocolCategoryPills();
       renderProtocols('all');
     }
 
+    function updateProtocolCategoryPills() {
+      const container = document.getElementById('protocol-category-pills');
+      if (!container) return;
+
+      const standardCats = ['Ngoại tiêu hóa', 'Cấp cứu - Hồi sức', 'Chấn thương', 'An toàn phẫu thuật'];
+      const extraCats = Array.from(new Set(protocols.map(p => p.category))).filter(c => c && !standardCats.includes(c));
+      const allDisplayCats = ['all', ...standardCats, ...extraCats];
+
+      container.innerHTML = allDisplayCats.map(cat => {
+        const count = cat === 'all' ? protocols.length : protocols.filter(p => p.category === cat).length;
+        if (cat !== 'all' && count === 0) return '';
+        const isActive = cat === currentProtoCategory;
+        const label = cat === 'all' ? 'Tất cả' : cat;
+        return `
+          <button type="button" onclick="filterProtocols('${esc(cat)}')" 
+            class="proto-pill ${isActive ? 'active bg-teal-600 text-white font-medium' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 font-normal'} px-3 py-1.5 rounded-lg transition" 
+            data-cat="${esc(cat)}">
+            ${esc(label)} <span class="opacity-75 text-[10px]">(${count})</span>
+          </button>
+        `;
+      }).join('');
+    }
+
     function filterProtocols(cat) {
-      document.querySelectorAll('.proto-pill').forEach(p => {
-        p.classList.remove('active', 'bg-teal-600', 'text-white');
-        p.classList.add('bg-slate-100', 'dark:bg-slate-800', 'text-slate-600', 'dark:text-slate-300');
-        if (p.dataset.cat === cat) {
-          p.classList.add('active', 'bg-teal-600', 'text-white');
-          p.classList.remove('bg-slate-100', 'dark:bg-slate-800', 'text-slate-600', 'dark:text-slate-300');
-        }
-      });
+      currentProtoCategory = cat;
+      updateProtocolCategoryPills();
       renderProtocols(cat);
+    }
+
+    function onProtocolSearch(val) {
+      protocolSearchQuery = (val || '').toLowerCase().trim();
+      renderProtocols(currentProtoCategory);
     }
 
     function renderProtocols(cat) {
       const container = document.getElementById('protocol-list');
-      const filtered = cat === 'all' ? protocols : protocols.filter(p => p.category === cat);
+      if (!container) return;
+
+      let filtered = cat === 'all' ? protocols : protocols.filter(p => p.category === cat);
+      if (protocolSearchQuery) {
+        filtered = filtered.filter(p => 
+          (p.title && p.title.toLowerCase().includes(protocolSearchQuery)) ||
+          (p.indication && p.indication.toLowerCase().includes(protocolSearchQuery)) ||
+          (p.category && p.category.toLowerCase().includes(protocolSearchQuery)) ||
+          (p.steps && p.steps.some(s => s.toLowerCase().includes(protocolSearchQuery))) ||
+          (p.complications && p.complications.toLowerCase().includes(protocolSearchQuery))
+        );
+      }
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="col-span-full py-12 text-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl bg-white/50 dark:bg-slate-900/50">
+            <i data-lucide="scissors" class="w-10 h-10 mx-auto text-slate-300 dark:text-slate-600 mb-2"></i>
+            <p class="text-sm font-semibold text-slate-600 dark:text-slate-300">Không tìm thấy protocol nào phù hợp</p>
+            <p class="text-xs text-slate-400 mt-1">Bác sĩ có thể bấm "Thêm Protocol mới" ở trên để tạo phác đồ.</p>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
 
       container.innerHTML = filtered.map(item => `
-        <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col justify-between space-y-3">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col justify-between space-y-3 hover:shadow-md transition">
           <div>
-            <div class="flex items-center justify-between gap-2 mb-1.5">
-              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-100 dark:bg-teal-900/50 text-teal-800 dark:text-teal-300">${esc(item.category)}</span>
-              <button onclick="copyProtocolText('${item.id}')" class="text-xs text-slate-400 hover:text-teal-600 flex items-center gap-1">
-                <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy quy trình
-              </button>
+            <!-- Header card -->
+            <div class="flex items-center justify-between gap-2 mb-2">
+              <span class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-teal-100 dark:bg-teal-900/50 text-teal-800 dark:text-teal-300">
+                ${esc(item.category)}
+              </span>
+              <!-- Action buttons: Copy, Edit, Delete -->
+              <div class="flex items-center gap-1">
+                <button type="button" onclick="copyProtocolText('${esc(item.id)}')" class="p-1.5 rounded-lg text-slate-400 hover:text-teal-600 dark:hover:text-teal-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition" title="Sao chép toàn bộ quy trình">
+                  <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                </button>
+                <button type="button" onclick="openEditProtocolModal('${esc(item.id)}')" class="p-1.5 rounded-lg text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/40 transition" title="Chỉnh sửa trực tiếp protocol này">
+                  <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+                </button>
+                <button type="button" onclick="deleteProtocol('${esc(item.id)}')" class="p-1.5 rounded-lg text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 transition" title="Xóa protocol này">
+                  <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                </button>
+              </div>
             </div>
-            <h3 class="font-bold text-sm sm:text-base text-slate-900 dark:text-white leading-snug">${esc(item.title)}</h3>
+
+            <!-- Title -->
+            <h3 class="font-bold text-sm sm:text-base text-slate-900 dark:text-white leading-snug">
+              ${esc(item.title)}
+            </h3>
             
+            <!-- Details -->
             <div class="mt-2.5 text-xs text-slate-600 dark:text-slate-300 space-y-1.5">
-              <div><b class="text-slate-900 dark:text-slate-100">Chỉ định:</b> ${esc(item.indication)}</div>
+              ${item.indication ? `<div><b class="text-slate-900 dark:text-slate-100">Chỉ định:</b> ${esc(item.indication)}</div>` : ''}
               
               <div class="mt-2">
                 <b class="text-slate-900 dark:text-slate-100 block mb-1">Các bước chính:</b>
                 <ol class="list-decimal list-inside space-y-1 pl-1 text-slate-600 dark:text-slate-300 leading-relaxed">
-                  ${item.steps.map(s => `<li>${esc(s)}</li>`).join('')}
+                  ${(item.steps || []).map(s => `<li>${esc(s)}</li>`).join('')}
                 </ol>
               </div>
 
-              ${item.complications ? `<div class="mt-2 text-amber-700 dark:text-amber-300 text-[11px] bg-amber-50 dark:bg-amber-950/30 p-2 rounded-lg"><b>Tai biến & Lưu ý:</b> ${esc(item.complications)}</div>` : ''}
+              ${item.complications ? `<div class="mt-2 text-amber-700 dark:text-amber-300 text-[11px] bg-amber-50 dark:bg-amber-950/30 p-2.5 rounded-xl border border-amber-200/50 dark:border-amber-800/40"><b>Tai biến & Lưu ý:</b> ${esc(item.complications)}</div>` : ''}
             </div>
           </div>
 
-          <div class="pt-2 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center text-xs text-slate-400">
-            <span>Hậu phẫu: ${esc(item.postOp || 'Theo dõi thường quy')}</span>
+          <!-- Footer -->
+          <div class="pt-2.5 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center text-xs text-slate-400">
+            <span><b>Hậu phẫu:</b> ${esc(item.postOp || 'Theo dõi thường quy')}</span>
           </div>
         </div>
       `).join('');
@@ -1927,30 +2086,136 @@
     function copyProtocolText(protoId) {
       const p = protocols.find(x => x.id === protoId);
       if (!p) return;
-      const text = `=== ${p.title.toUpperCase()} ===\nChuyên khoa: ${p.category}\nChỉ định: ${p.indication}\n\nCÁC BƯỚC TIẾN HÀNH:\n${p.steps.map((s, i) => `${i + 1}. ${s}`).join('\n')}\n\nTai biến cần lưu ý: ${p.complications}\nChăm sóc hậu phẫu: ${p.postOp}`;
+      const text = `=== ${p.title.toUpperCase()} ===\nChuyên khoa: ${p.category}\nChỉ định: ${p.indication}\n\nCÁC BƯỚC TIẾN HÀNH:\n${(p.steps || []).map((s, i) => `${i + 1}. ${s}`).join('\n')}\n\nTai biến cần lưu ý: ${p.complications || 'Không ghi nhận'}\nChăm sóc hậu phẫu: ${p.postOp || 'Theo dõi thường quy'}`;
       navigator.clipboard.writeText(text);
       showToast('Đã copy quy trình vào bộ nhớ tạm!', 'success');
     }
 
+    function onProtoCategorySelect(val) {
+      const customInput = document.getElementById('proto-form-category-custom');
+      if (val === 'Khác') {
+        customInput.classList.remove('hidden');
+        customInput.focus();
+      } else {
+        customInput.classList.add('hidden');
+      }
+    }
+
     function openNewProtocolModal() {
-      const title = prompt('Nhập tên phẫu thuật / thủ thuật:');
-      if (!title) return;
-      const cat = prompt('Chuyên khoa (Ngoại tiêu hóa, Chấn thương, Cấp cứu...):', 'Ngoại tiêu hóa') || 'Chung';
-      const stepsRaw = prompt('Nhập các bước chính (phân cách bằng dấu chấm phẩy ;):', 'Bước 1: Chuẩn bị; Bước 2: Rạch da; Bước 3: Đóng bụng');
+      document.getElementById('protocol-form').reset();
+      document.getElementById('proto-form-id').value = '';
+      document.getElementById('proto-modal-title').innerText = 'Thêm Protocol Mới';
+      document.getElementById('proto-modal-submit-text').innerText = 'Thêm Protocol';
+      document.getElementById('proto-form-category-custom').classList.add('hidden');
+      document.getElementById('protocol-modal').classList.remove('hidden');
+    }
+
+    function openEditProtocolModal(id) {
+      const p = protocols.find(x => x.id === id);
+      if (!p) return;
+
+      document.getElementById('proto-form-id').value = p.id;
+      document.getElementById('proto-form-title').value = p.title || '';
       
-      const newP = {
-        id: 'proto_' + Date.now(),
-        title: title,
-        category: cat,
-        indication: 'Theo chỉ định lâm sàng',
-        steps: (stepsRaw || '').split(';').map(s => s.trim()).filter(Boolean),
-        complications: 'Chảy máu, nhiễm trùng',
-        postOp: 'Theo dõi sinh hiệu'
-      };
-      protocols.unshift(newP);
+      const sel = document.getElementById('proto-form-category-select');
+      const custom = document.getElementById('proto-form-category-custom');
+      const hasOption = Array.from(sel.options).some(o => o.value === p.category);
+      if (hasOption) {
+        sel.value = p.category;
+        custom.classList.add('hidden');
+        custom.value = '';
+      } else {
+        sel.value = 'Khác';
+        custom.classList.remove('hidden');
+        custom.value = p.category || '';
+      }
+
+      document.getElementById('proto-form-indication').value = p.indication || '';
+      document.getElementById('proto-form-steps').value = (p.steps || []).join('\n');
+      document.getElementById('proto-form-complications').value = p.complications || '';
+      document.getElementById('proto-form-postop').value = p.postOp || '';
+
+      document.getElementById('proto-modal-title').innerText = 'Chỉnh Sửa Protocol';
+      document.getElementById('proto-modal-submit-text').innerText = 'Lưu Thay Đổi';
+      document.getElementById('protocol-modal').classList.remove('hidden');
+    }
+
+    function closeProtocolModal() {
+      document.getElementById('protocol-modal').classList.add('hidden');
+    }
+
+    function saveProtocolForm(e) {
+      e.preventDefault();
+      const id = document.getElementById('proto-form-id').value;
+      const title = document.getElementById('proto-form-title').value.trim();
+      const catSel = document.getElementById('proto-form-category-select').value;
+      const catCustom = document.getElementById('proto-form-category-custom').value.trim();
+      const category = catSel === 'Khác' ? (catCustom || 'Chung') : catSel;
+      const indication = document.getElementById('proto-form-indication').value.trim() || 'Theo chỉ định lâm sàng';
+      const stepsRaw = document.getElementById('proto-form-steps').value;
+      const steps = stepsRaw.split('\n').map(s => s.trim()).filter(Boolean);
+      const complications = document.getElementById('proto-form-complications').value.trim();
+      const postOp = document.getElementById('proto-form-postop').value.trim();
+
+      if (!title) {
+        showToast('Vui lòng nhập tên protocol!', 'warning');
+        return;
+      }
+      if (steps.length === 0) {
+        showToast('Vui lòng nhập ít nhất một bước tiến hành!', 'warning');
+        return;
+      }
+
+      if (id) {
+        // Update existing
+        const idx = protocols.findIndex(x => x.id === id);
+        if (idx !== -1) {
+          protocols[idx] = {
+            ...protocols[idx],
+            title, category, indication, steps, complications, postOp
+          };
+          showToast('Đã lưu chỉnh sửa protocol thành công!', 'success');
+        }
+      } else {
+        // Add new
+        const newP = {
+          id: 'proto_' + Date.now(),
+          title, category, indication, steps, complications, postOp
+        };
+        protocols.unshift(newP);
+        showToast('Đã thêm protocol mới thành công!', 'success');
+      }
+
       localStorage.setItem('clinical_desk_protocols_v1', JSON.stringify(protocols));
-      renderProtocols('all');
-      showToast('Đã thêm protocol mới thành công!', 'success');
+      closeProtocolModal();
+      updateProtocolCategoryPills();
+      renderProtocols(currentProtoCategory);
+    }
+
+    function deleteProtocol(id) {
+      const p = protocols.find(x => x.id === id);
+      if (!p) return;
+      if (confirm(`Bác sĩ có chắc chắn muốn xóa protocol "${p.title}" không? Thao tác này không thể hoàn tác.`)) {
+        protocols = protocols.filter(x => x.id !== id);
+        localStorage.setItem('clinical_desk_protocols_v1', JSON.stringify(protocols));
+        updateProtocolCategoryPills();
+        renderProtocols(currentProtoCategory);
+        showToast('Đã xóa protocol thành công!', 'info');
+      }
+    }
+
+    function resetDefaultProtocols() {
+      if (confirm('Bác sĩ có muốn khôi phục lại toàn bộ danh sách protocol mẫu chuẩn ban đầu không? (Các protocol đã chỉnh sửa hoặc thêm mới có thể bị ghi đè)')) {
+        protocols = JSON.parse(JSON.stringify(DEFAULT_PROTOCOLS));
+        localStorage.setItem('clinical_desk_protocols_v1', JSON.stringify(protocols));
+        currentProtoCategory = 'all';
+        protocolSearchQuery = '';
+        const searchInput = document.getElementById('protocol-search-input');
+        if (searchInput) searchInput.value = '';
+        updateProtocolCategoryPills();
+        renderProtocols('all');
+        showToast('Đã khôi phục lại protocol mẫu mặc định!', 'success');
+      }
     }
 
     // -------------------------------------------------------------
